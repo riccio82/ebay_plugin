@@ -1,0 +1,315 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Volume Analysis - MateCat</title>
+    <meta name="description" content="MateCat allows you to get more matches than any other CAT tool."/>
+    <meta name="viewport" content="width=device-width"/>
+    <link href="${basepath}public/css/common.css?build=${build_number}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="${basepath}public/css/analyze.css?build=${build_number}"/>
+    <link rel="stylesheet" href="${basepath}public/css/popup.css?build=${build_number}"/>
+
+    <script type="text/javascript">
+        var config = {
+            basepath: '${basepath | string:/}',
+            status: '${project_status}',
+            totalSegments: '${num_segments}',
+            totalAnalyzed: '${num_segments_analyzed}',
+            isLoggedIn: '${isLoggedIn}',
+            daemon_warning: ${daemon_misconfiguration},
+            support_mail: '${support_mail}',
+            id_project: '${pid}',
+            password: '${project_password}'
+        };
+    </script>
+
+    <style type="text/css">
+        body#analyze .loadingbar { position: relative; margin-top: 10px; top: 0px;  }
+        .tablestats td.languages { width: 100% }
+        .project-data .tablestats, .instructions { width: 50%; }
+
+    </style>
+
+    <script type="text/javascript" src="${basepath}public/js/lib/jquery.js"></script>
+    <script type="text/javascript" src="${basepath}public/js/lib/jquery-ui.js"></script>
+    <script type="text/javascript" src="${basepath}public/js/lib/jquery-dateFormat.min.js"></script>
+    <script type="text/javascript" src="${basepath}public/js/forcedelivery.js"></script>
+
+    <script type="text/javascript" src="${basepath}public/js/lib/jquery.cookie.js"></script>
+    <script type="text/javascript" src="${basepath}public/js/common.js?build=${build_number}"></script>
+    <script type="text/javascript" src="${basepath}public/js/analyze.js?build=${build_number}"></script>
+    <script type="text/javascript" src="${basepath}public/js/outsource.js?build=${build_number}"></script>
+    <script type='text/javascript' src="${basepath}public/js/login.js?build=${build_number}"></script>
+    <script type='text/javascript' src="${basepath}public/js/logout.js?build=${build_number}"></script>
+
+    <div metal:use-macro="${php: INIT::$ROOT}/public/holidays/holidays.html/analyze_holidays"/>
+
+</head>
+
+
+<body id="analyze">
+
+<header>
+    <div class="wrapper">
+        <a href="${basepath}" class="logo"></a>
+    </div>
+</header>
+
+
+<div class="body">
+
+    <div class="loadingbar open start">
+
+        <div class="wrapper" id="shortloading">
+            <p class="label">Fast word counting...</p>
+
+        </div>
+
+        <div class="cl"></div>
+
+        <div class="wrapper" id="longloading">
+            <p>Searching for TM matches
+                <span class="detailss">(<span id="analyzedSegmentsReport">0</span> of <span id="totalSegmentsReport">0</span> segments)...</span>
+            </p>
+
+            <div class="meter">
+                <a href="#" class="approved-bar" title="Analyzing 0.0%"></a>
+                <a href="#" id="close">close</a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="wrapper">
+
+        <div class="instructions">
+            <h4>Instructions</h4>
+            <p tal:content="project_data/instructions">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ac diam sit amet quam vehicula elementum
+                sed sit amet dui. Proin eget tortor risus. Sed porttitor lectus nibh. Vivamus magna justo, lacinia eget cons
+                ectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Vestibulum a
+                c diam sit amet quam vehicula elementum sed sit amet dui. Vestibulum ante ipsum primis in faucibus orci luctus et
+                ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel,
+                ullamcorper sit amet ligula. Donec sollicitudin molestie malesuada. Proin eget tortor risus.
+            </p>
+        </div>
+
+        <div class="project-data">
+            <table class="tablestats">
+                <thead>
+
+                </thead>
+
+                <tbody>
+                <tr>
+                    <th>File name</th>
+                    <th>Word count</th>
+                    <th>Due Date</th>
+
+                </tr>
+                <tr>
+                    <td style="text-align: left;" tal:content="project_data/file_name"></td>
+                    <td tal:content="project_data/word_count"></td>
+                    <td tal:content="project_data/due_date"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="wrapper">
+        <tal:block tal:define="id_for_job php:array()" tal:repeat="id_for_job jobs">
+
+            <div tal:attributes="data-jid string:${repeat/id_for_job/key}; class string:jobcontainer ${id_for_job/splitted}">
+                <div tal:define="splitted id_for_job/splitted">
+
+                    <h3>
+                        <span class="source_lang" tal:content="id_for_job/source">English</span> &gt; <span class="target_lang" tal:content="id_for_job/target">Italian</span>
+                    </h3>
+
+                    <div class="splitbtn-cont">
+                        <span class="splitmsg">Splitted in 2 parts</span>
+                        <span class="label left">Split in</span>
+                        <select name="" class="splitselect">
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option>
+                            <option value="22">22</option>
+                            <option value="23">23</option>
+                            <option value="24">24</option>
+                            <option value="25">25</option>
+                            <option value="26">26</option>
+                            <option value="27">27</option>
+                            <option value="28">28</option>
+                            <option value="29">29</option>
+                            <option value="30">30</option>
+                        </select>
+                        <span class="label left">Jobs</span>
+
+                        <a href="#" class="dosplit splitbtn disabled" title="You cannot split a job with 1 or 0 payable words.">Split</a>
+
+                    </div>
+                    <div class="nosplit"><a href="#" class="domerge mergebtn">Merge all</a></div>
+                    <!-- END CONTAINER SPLIT JOBS BUTTONS  -->
+
+
+                    <div metal:use-macro="analyze_partials.html/tablestats"/>
+
+
+                </div>
+            </div>
+
+        </tal:block>
+
+
+    </div>
+    <div class="cl"></div>
+</div>
+
+
+<div class="modal popup-split" data-type="view">
+    <div class="popup-outer"></div>
+    <div class="popup">
+        <a href="#" class="x-popup"></a>
+
+        <h1>Split <span class="jid" data-jid="">Job</span> in <span class="chunks">x</span> parts</h1>
+
+        <div class="popup-box split-box3">
+            <ul class="jobs">
+                <li>
+                    <div><h4>Part 1</h4></div>
+
+                    <div class="job-details">
+                        <div class="job-perc"><p><span class="aprox">Approx. words:</span><span class="correct none">Words:</span>
+                        </p>
+                            <!-- A: la classe Aprox scompare se viene effettuato il calcolo -->
+                            <input type="text" class="input-small" value="50.000"/>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div><h4>Part 2</h4></div>
+                    <div class="job-details">
+                        <div class="job-perc"><p><span class="aprox">Approx. words:</span><span class="correct none">Words:</span>
+                        </p>
+                            <!-- A: la classe Aprox scompare se viene effettuato il calcolo -->
+                            <input type="text" class="input-small" value="50.000"/>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <div class="total">
+                <p class="wordsum">Total words: <span class="total-w">x</span></p>
+
+                <p class="error-count current">Current count: <span class="curr-w">x</span></p>
+
+                <p class="error-count"><span class="txt">Difference</span>: <span class="diff-w">x</span></p>
+                <!-- A:  il p error appare solo se i valori inseriti negli input dei singoli split job non restituiscono la somma totale -->
+            </div>
+            <div class="error-message none">
+                <p>Cannot split in # chunks, do this</p>
+            </div>
+            <div class="cl"></div>
+            <div class="btnsplit">
+
+                <a id="exec-split" class="uploadbtn loader">
+                    <span class="uploadloader"></span>
+                    <span class="text">Check</span>
+                </a>
+                <a id="exec-split-confirm" class="splitbtn done none">
+                    <span class="text">Confirm</span>
+                </a>
+                <span class="btn fileinput-button btn-cancel right">
+                    <span>Cancel</span>
+                </span>
+            </div>
+        </div>
+        <!-- END DIV SPLIT BOX -->
+    </div>
+    <!-- END DIV POPUP-SPLIT INTERNO -->
+</div>
+<!-- END DIV POPUP-SPLIT -->
+
+<footer>
+    <div class="wrapper">
+
+        <nav>
+            <ul>
+                <li><a tal:attributes="href string:${basepath}manage/">Manage</a></li>
+                <li><a href="https://www.matecat.com/support/" target="_blank">Support</a></li>
+            </ul>
+
+
+            <tal:block tal:condition="php: !empty(logged_user)">
+                <div id='welcomebox' tal:attributes="title extended_user">
+                    <span tal:content='logged_user'></span> (<a id='logoutlink' href='#'>logout</a>)
+                </div>
+            </tal:block>
+
+        </nav>
+
+    </div>
+</footer>
+
+<!-- POPUP LOGIN -->
+<div id='popupWrapper'>
+    <div class="popup-outer"></div>
+    <div class="popup">
+
+        <a href="#" class="x-popup"></a>
+
+        <h1>Login</h1>
+
+        <h2>
+            Log in to add the project to your management panel.<br/>If the project is not added, you will not be able to
+            retrieve the URL.
+        </h2>
+
+        <div class="outer">
+            <div class="inner">
+                <button id="sign-in" name="" type="button" class="login-button"
+                        tal:attributes='data-oauth oauthFormUrl'>Sign in using Google
+                </button>
+            </div>
+        </div>
+        <br/> Or <br/>
+        <a href="#" class="anonymous"> Stay anonymous</a>
+
+    </div>
+</div>
+<script>
+    $(".deliverychange").click(function() {
+        $(this).hide();
+        $("#changeTimezone").removeClass("noselect");
+    });
+    $(".currencychange").click(function() {
+        $(this).hide();
+        $("#changecurrency").show();
+    });
+</script>
+<!-- FINE POPUP LOGIN -->
+<div metal:use-macro="${php: INIT::$TEMPLATE_ROOT}/cookiebanner.html/cookieBanner"/>
+<!-- Snapengage -->
+<script src="${basepath}public/js/lib/snapengage.js"></script>
+<!-- // Snapengage -->
+
+<div metal:use-macro="${php: INIT::$TEMPLATE_ROOT}/external_sources.html/track_codes_analyze"/>
+
+</body>
+</html>
