@@ -116,6 +116,18 @@
                 </tbody>
             </table>
         </div>
+
+        <tal:block tal:condition="php: !empty(reference_files)">
+            <h4>Reference files</h4>
+
+            <ul>
+                <li tal:repeat="file reference_files" >
+                    <a tal:attributes="href string:${basepath}features/ebay/reference-files/${pid}/${project_password}/${file/index}"  tal:content="file/name"></a>
+                </li>
+            </ul>
+
+        </tal:block>
+
     </div>
     <div class="wrapper">
         <tal:block tal:define="id_for_job php:array()" tal:repeat="id_for_job jobs">
