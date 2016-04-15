@@ -165,6 +165,11 @@ class Ebay extends BaseFeature {
             $controller->setView( $template_path );
             $controller->respond();
         } );
+
+        $klein->respond( 'GET', '/reference-files/[:id_project]/[:password]/[:zip_index]', function ( $request, $response, $service ) {
+            $controller    = new Ebay\Controller\ReferenceFilesController( $request, $response, $service );
+            $controller->downloadFile();
+        } );
     }
 
 

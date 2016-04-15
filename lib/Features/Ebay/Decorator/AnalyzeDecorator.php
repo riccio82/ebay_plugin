@@ -67,6 +67,8 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $template->num_segments_analyzed      = $this->model->num_segments_analyzed;
         $template->subject                    = $this->model->subject;
 
+        $template->reference_files            = $this->model->reference_files ;
+
         $client                 = \OauthClient::getInstance()->getClient();
         $template->oauthFormUrl = $client->createAuthUrl();
 
