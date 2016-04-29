@@ -140,6 +140,21 @@ class Ebay extends BaseFeature {
         return round( $edit_distance );
     }
 
+
+    /**
+     * This function updates the eq_word_count setting it to null right before the project is
+     * closed by the TM Analysis. This way we force the project to always use raw word count.
+     *
+     * @param \Projects_ProjectStruct $project
+     */
+    public function beforeTMAnalysisCloseProject(\Projects_ProjectStruct $project) {
+        $sql = "UPDATE segment_translations SET eq_word_count = null " .
+                " WHERE id_job IN ( SELECT id FROM jobs WHERE id_project = ? )";
+        $conn = \Database::obtain()->getConnection() ;
+        $stmt = $conn->prepare( $sql );
+        $stmt->execute(array( $project->id ));
+    }
+
     /**
      * When project_type is 'MT', pretranslated segments are to be saved as DRAFT
      * for Ebay.
