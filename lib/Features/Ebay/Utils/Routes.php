@@ -19,7 +19,7 @@ class Routes {
 
         $host = \Routes::httpHost($options);
 
-        return $host . "/features/ebay/analyze/" .
+        return $host . "/plugins/ebay/analyze/" .
             $params[ 'project_name' ] . "/" .
             $params[ 'id_project' ] . "-" .
             $params[ 'password' ];
