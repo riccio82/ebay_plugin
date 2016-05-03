@@ -12,6 +12,11 @@ use \INIT ;
 
 class Routes {
 
+    public static function staticBuild( $file, $options=array() ) {
+        $host = \Routes::httpHost($options);
+        return $host . "/plugins/ebay/static/build/$file" ;
+    }
+
     public static function analyze( $params, $options=array()) {
         $params = \Utils::ensure_keys( $params, array(
                 'project_name', 'id_project', 'password'

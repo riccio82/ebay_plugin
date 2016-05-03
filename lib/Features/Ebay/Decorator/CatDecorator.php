@@ -10,6 +10,7 @@ namespace Features\Ebay\Decorator;
 
 use AbstractDecorator;
 use Constants_TranslationStatus;
+use Features\Ebay\Utils\Routes;
 
 
 class CatDecorator extends \AbstractDecorator {
@@ -23,7 +24,15 @@ class CatDecorator extends \AbstractDecorator {
 
     protected $metadata ;
 
+    /**
+     * @var \PHPTALWithAppend
+     */
+    protected $template ;
+
     public function decorate() {
+
+        $this->template->append('footer_js', Routes::staticBuild('ebay.js') );
+
         $this->metadata = $this->controller->getJob()->getProject()->getMetadataAsKeyValue();
         $this->statuses = new SegmentStatuses(
                 $this->controller->getJob()->getProject()
