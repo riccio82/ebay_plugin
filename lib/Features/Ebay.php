@@ -111,6 +111,8 @@ class Ebay extends BaseFeature {
                 'edit_distance' => $this->edit_distance
         );
 
+
+        \WorkerClient::init(); // TODO: this should not be needed, to investigate.
         \WorkerClient::enqueue( 'P2', $class_name, $data, $options );
     }
 
