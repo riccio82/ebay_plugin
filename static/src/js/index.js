@@ -47,8 +47,20 @@ if ( config.isReview )
 
             $( '#stat-todo strong' ).html( t_formatted );
             $( '#stat-wph strong' ).html( wph );
-            $( '#stat-completion strong' ).html( completion );
-            $( '#total-payable' ).html( s.TOTAL_FORMATTED );
+
+            $('#stat-completion strong').html(completion);
+            $('#stat-eqwords').remove();
+            $('#stat-todo').remove();
+
+            var reviewedWords = $('<li>').append(
+                $('<span>Reviewed words:</span>')
+            ).append(
+                '&nbsp;'
+            ).append(
+                $('<strong>').text( s.APPROVED + s.REJECTED )
+            );
+
+            $('.statistics-core').append( reviewedWords ) ;
 
 
         }
