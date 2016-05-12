@@ -38,9 +38,10 @@ if ( config.isReview )
             this.done_percentage = this.progress_perc;
 
             $( '.approved-bar', m ).css( 'width', a_perc + '%' ).attr( 'title', 'Approved ' + a_perc_formatted + '%' );
-            $( '.draft-bar', m ).css( 'width', d_perc + '%' ).attr( 'title', 'Draft ' + d_perc_formatted + '%' );
             $( '.rejected-bar', m ).css( 'width', r_perc + '%' ).attr( 'title', 'Rejected ' + r_perc_formatted + '%' );
+
             $( '.translated-bar', m ).css( 'width', 0 + '%' ) ; // force translated to 0
+            $( '.draft-bar', m ).css( 'width', 0 + '%' ); // force draft bar to 0
 
             $( '#stat-progress' ).html( Number((a_perc + r_perc).toFixed(2) )); // show perc of revise segments
 
@@ -60,7 +61,7 @@ if ( config.isReview )
                 $('<strong>').text( s.APPROVED + s.REJECTED )
             );
 
-            $('.statistics-core').append( reviewedWords ) ;
+            $('.statistics-core').html( reviewedWords ) ;
 
 
         }
