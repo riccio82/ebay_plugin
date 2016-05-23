@@ -37,7 +37,7 @@ class AnalyzeController {
     }
 
     public function setView( $template_name ) {
-        $this->view = new \PHPTAL( $template_name );
+        $this->view = new \PHPTALWithAppend( $template_name );
     }
 
 
