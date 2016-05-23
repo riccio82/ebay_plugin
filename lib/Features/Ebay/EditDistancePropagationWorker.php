@@ -9,13 +9,12 @@
 
 namespace Features\Ebay ;
 
+use \TaskRunner\Commons\AbstractWorker;
 use TaskRunner\Commons\AbstractElement;
-use TaskRunner\Commons\Context;
 use TaskRunner\Commons\QueueElement ;
 
-class EditDistancePropagationWorker extends \TaskRunner\Commons\AbstractWorker {
+class EditDistancePropagationWorker extends AbstractWorker {
     protected $_queueHandler;
-    protected $_myContext;
 
     public function process( AbstractElement $queueElement ) {
         $this->_doLog( $queueElement->params );
