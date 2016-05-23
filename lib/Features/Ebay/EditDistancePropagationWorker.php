@@ -17,11 +17,7 @@ class EditDistancePropagationWorker extends \TaskRunner\Commons\AbstractWorker {
     protected $_queueHandler;
     protected $_myContext;
 
-    public function __construct( \AMQHandler $queueHandler ) {
-        $this->_queueHandler = $queueHandler;
-    }
-
-    public function process( AbstractElement $queueElement, Context $queueContext ) {
+    public function process( AbstractElement $queueElement ) {
         $this->_doLog( $queueElement->params );
 
         $out = \Translations_SegmentTranslationDao::updateEditDistanceForPropagation(
