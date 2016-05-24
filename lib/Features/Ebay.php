@@ -118,7 +118,10 @@ class Ebay extends BaseFeature {
 
     /**
      *
-     * Gets the edit distance
+     * Gets the edit distance.
+     *
+     * TODO: change this to static funciton, it's wrong to have instance methods
+     * on this class because it's too generic and will likely to become polluted.
      *
      * @param $translation
      *
