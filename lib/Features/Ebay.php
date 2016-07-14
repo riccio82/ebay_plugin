@@ -153,11 +153,20 @@ class Ebay extends BaseFeature {
      * @param \Projects_ProjectStruct $project
      */
     public function beforeTMAnalysisCloseProject(\Projects_ProjectStruct $project) {
+        $db = \Database::obtain()->getConnection() ;
+
+        $sql_project_id = 'SELECT id FROM jobs WHERE id_project = ?';
+        $stmt = $db->prepare( $sql_project_id );
+
+        $stmt->setFetchMode( \PDO::FETCH_ASSOC );
+        $stmt->execute( array( $project->id ) ) ;
+        $result = $stmt->fetch();
+
         $sql = "UPDATE segment_translations SET eq_word_count = null " .
-                " WHERE id_job IN ( SELECT id FROM jobs WHERE id_project = ? )";
-        $conn = \Database::obtain()->getConnection() ;
-        $stmt = $conn->prepare( $sql );
-        $stmt->execute(array( $project->id ));
+                " WHERE id_job = ? ";
+        $stmt = $db->prepare( $sql );
+
+        $stmt->execute( array( $project->id ) );
     }
 
     /**
