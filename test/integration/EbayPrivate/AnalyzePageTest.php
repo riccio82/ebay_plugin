@@ -9,6 +9,7 @@
 class AnalyzePageTest extends IntegrationTest {
 
     function setUp() {
+        $this->test_data = new StdClass();
         $this->test_data->user = Factory_User::create();
 
         $feature = Factory_OwnerFeature::create( array(
@@ -34,8 +35,8 @@ class AnalyzePageTest extends IntegrationTest {
                 ),
                 'params'  => array(
                         'metadata' => '{"project_type" : "MT"}',
-                        'source_lang'   => 'en',
-                        'target_lang'   => 'it',
+                        'source_lang'   => 'en-US',
+                        'target_lang'   => 'it-IT',
                         'name' => 'foo',
                 )
         ) );

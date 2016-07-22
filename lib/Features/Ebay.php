@@ -12,6 +12,7 @@ namespace Features;
 use Exceptions\ValidationError;
 
 use Features\Ebay\Utils\Routes as Routes ;
+use Features\Ebay\Utils\PrivateTmKeys;
 
 class Ebay extends BaseFeature {
 
@@ -151,6 +152,8 @@ class Ebay extends BaseFeature {
      * closed by the TM Analysis. This way we force the project to always use raw word count.
      *
      * @param \Projects_ProjectStruct $project
+     * 
+     * TODO: this code needs to be refactored
      */
     public function beforeTMAnalysisCloseProject(\Projects_ProjectStruct $project) {
         $db = \Database::obtain()->getConnection() ;
@@ -165,8 +168,8 @@ class Ebay extends BaseFeature {
         $sql = "UPDATE segment_translations SET eq_word_count = null " .
                 " WHERE id_job = ? ";
         $stmt = $db->prepare( $sql );
-
-        $stmt->execute( array( $project->id ) );
+        $stmt->execute( array( $result['id'] ) ) ; 
+        
     }
 
     /**
@@ -185,6 +188,17 @@ class Ebay extends BaseFeature {
         }
 
         return $status;
+    }
+
+    /**
+     * This is where we override the private key we receive at project creation with the one hardcoded
+     * where the glossaries have previously be
+     */
+    public function filter_project_manager_private_tm_key($keys, $params) {
+        $projectStructure = $params['project_structure'] ;
+
+        $privateKeys = new PrivateTmKeys($projectStructure['source_language'], $projectStructure['target_language']);
+        return $privateKeys->getKeys();
     }
 
     public static function loadRoutes( \Klein\Klein $klein ) {

@@ -3,6 +3,7 @@
 class SetsRawWordCountProjectPropertyTest extends IntegrationTest {
 
     function setUp() {
+        $this->test_data = new StdClass();
         $this->test_data->user = Factory_User::create();
 
         $feature = Factory_OwnerFeature::create( array(
@@ -29,8 +30,8 @@ class SetsRawWordCountProjectPropertyTest extends IntegrationTest {
                 ),
                 'params'  => array(
                         'project_type' => 'MT',
-                        'source_lang'   => 'en',
-                        'target_lang'   => 'it'
+                        'source_lang'   => 'en-US',
+                        'target_lang'   => 'it-IT'
                 )
         ) );
 
