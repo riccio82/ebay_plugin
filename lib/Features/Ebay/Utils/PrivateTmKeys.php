@@ -16,7 +16,7 @@ namespace Features\Ebay\Utils;
 if ( \INIT::$ENV == 'test' || \INIT::$ENV == 'development' ) {
     define('HARDCODED_TM_KEY', '94f38f04b201939b25be');
 } else {
-    define('HARDCODED_TM_KEY', 'ef7d11d4d0a30f685583');
+    define('HARDCODED_TM_KEY', 'bbd1221285eeff616428');
 }
 
 class PrivateTmKeys {
