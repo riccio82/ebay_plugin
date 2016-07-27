@@ -168,8 +168,26 @@ class Ebay extends BaseFeature {
         $sql = "UPDATE segment_translations SET eq_word_count = null " .
                 " WHERE id_job = ? ";
         $stmt = $db->prepare( $sql );
-        $stmt->execute( array( $result['id'] ) ) ; 
-        
+        $stmt->execute( array( $result['id'] ) ) ;
+    }
+
+
+    /**
+     * Ignore all glossaries. Temporary hack to avoid something unknown on MyMemory side.
+     * We simply change the array_files key to avoid any glossary to be sent to MyMemory.
+     *
+     * TODO: glossary detection based on extension is brittle.
+     *
+     */
+    public function filter_project_manager_array_files( $files, $projectStructure ) {
+        $new_files = array() ;
+        foreach ( $files as $file ) {
+            if ( \FilesStorage::pathinfo_fix( $file, PATHINFO_EXTENSION ) != 'g' ) {
+                $new_files[] = $file ;
+            }
+        }
+
+        return $new_files   ;
     }
 
     /**
