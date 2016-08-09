@@ -28,7 +28,10 @@ class PrivateTmKeys {
             'en-US|fr-FR' => HARDCODED_TM_KEY,
             'en-US|it-IT' => HARDCODED_TM_KEY,
             'en-US|pt-BR' => HARDCODED_TM_KEY,
-            'en-US|ru-RU' => HARDCODED_TM_KEY
+            'en-US|ru-RU' => HARDCODED_TM_KEY,
+            'de-DE|en-US' => HARDCODED_TM_KEY,
+            'de-DE|fr-FR' => HARDCODED_TM_KEY,
+            'de-DE|it-IT' => HARDCODED_TM_KEY,
     );
 
     private $source;
