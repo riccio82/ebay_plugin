@@ -17,6 +17,9 @@ class EditDistancePropagationWorker extends AbstractWorker {
     protected $_queueHandler;
 
     public function process( AbstractElement $queueElement ) {
+
+        $this->_checkDatabaseConnection();
+
         $this->_doLog( $queueElement->params );
 
         $out = \Translations_SegmentTranslationDao::updateEditDistanceForPropagation(

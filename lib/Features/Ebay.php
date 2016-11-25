@@ -12,7 +12,6 @@ namespace Features;
 use Exceptions\ValidationError;
 
 use Features\Ebay\Utils\Routes as Routes ;
-use Features\Ebay\Utils\PrivateTmKeys;
 
 class Ebay extends BaseFeature {
 
@@ -194,7 +193,7 @@ class Ebay extends BaseFeature {
      * When project_type is 'MT', pretranslated segments are to be saved as DRAFT
      * for Ebay.
      *
-     * @param $args
+     * @param $status
      * @param $projectStructure
      *
      * @return string
@@ -206,17 +205,6 @@ class Ebay extends BaseFeature {
         }
 
         return $status;
-    }
-
-    /**
-     * This is where we override the private key we receive at project creation with the one hardcoded
-     * where the glossaries have previously be
-     */
-    public function filter_project_manager_private_tm_key($keys, $params) {
-        $projectStructure = $params['project_structure'] ;
-
-        $privateKeys = new PrivateTmKeys($projectStructure['source_language'], $projectStructure['target_language']);
-        return $privateKeys->getKeys();
     }
 
     public static function loadRoutes( \Klein\Klein $klein ) {
