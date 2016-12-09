@@ -13,7 +13,7 @@ use Features\Ebay\Decorator\AnalyzeDecorator ;
 
 use Analysis_AnalysisModel ;
 
-class AnalyzeController {
+class AnalyzeController extends \BaseKleinViewController {
 
     /**
      * @var \Projects_ProjectStruct
@@ -23,8 +23,12 @@ class AnalyzeController {
     /**
      * @var \PHPTAL ;
      */
-    private $view;
+    protected $view;
 
+    protected $model ;
+
+    // TODO: refactor this controller to make it call the parent constructor
+    // Calling bootstrap start here should not be necessary, since this extends a stateful controller
     public function __construct( \Klein\Request $request, \Klein\Response $response, $service) {
         $this->request = $request;
         $this->response = $response;
@@ -46,6 +50,9 @@ class AnalyzeController {
 
         $decorator->setUser( $this->currentUser() ) ;
         $decorator->decorate( $this->view );
+
+        $this->setLoggedUser() ;
+        $this->setDefaultTemplateData() ;
 
         $this->response->body( $this->view->execute() );
         $this->response->send();

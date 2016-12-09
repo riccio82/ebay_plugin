@@ -70,7 +70,6 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $template->reference_files            = $this->model->reference_files ;
 
         $client                 = \OauthClient::getInstance()->getClient();
-        $template->oauthFormUrl = $client->createAuthUrl();
 
         $template->support_mail    = INIT::$SUPPORT_MAIL;
 
