@@ -12,6 +12,12 @@ use \INIT ;
 
 class Routes {
 
+
+    public static function staticSrc( $file, $options=array() ) {
+        $host = \Routes::pluginsBase( $options );
+        return $host . "/ebay/static/src/$file" ;
+    }
+
     public static function staticBuild( $file, $options=array() ) {
         $host = \Routes::pluginsBase( $options );
         return $host . "/ebay/static/build/$file" ;

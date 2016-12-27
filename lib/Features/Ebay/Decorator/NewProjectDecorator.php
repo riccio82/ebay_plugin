@@ -8,14 +8,23 @@
 
 namespace Features\Ebay\Decorator;
 
-
+use Features\Ebay\Utils\Routes ;
 use Features\Ebay;
+
 
 class NewProjectDecorator extends \AbstractDecorator
 {
 
+
+    /**
+     * @var \PHPTALWithAppend
+     */
+    protected $template ;
+
     public function decorate()
     {
+        $this->template->append('footer_js', Routes::staticSrc('js/ebay-upload.js') );
+
         $path = Ebay::getTemplatesPath() ;
         $this->template->additional_input_params_base_path = $path . '/Html/' ;
     }

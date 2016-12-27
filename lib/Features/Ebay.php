@@ -105,7 +105,7 @@ class Ebay extends BaseFeature {
                 if ( !array_key_exists('errors', $projectStructure[ 'result' ])) {
                     $projectStructure[ 'result' ]['errors'] = array();
                 }
-                $projectStructure[ 'result' ]['errors'][] = "Due date is not valid";
+                $projectStructure[ 'result' ]['errors'][] = ['message' => "Due date is not valid"];
             }
         }
     }
