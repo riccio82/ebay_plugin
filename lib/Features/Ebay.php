@@ -265,7 +265,10 @@ class Ebay extends BaseFeature {
     public function createProjectAssignInputMetadata( $metadata, $options ) {
         $options = \Utils::ensure_keys( $options, array('input'));
 
-        return array_intersect_key( $metadata, array_flip( Metadata::$keys ) ) ;
+        $metadata = array_intersect_key( $options['input'], array_flip( Metadata::$keys ) ) ;
+        $metadata = array_filter( $metadata );
+
+        return  $metadata ;
     }
 
     /**
