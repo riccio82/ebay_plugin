@@ -121,6 +121,9 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
 
         $content = $zip->getFromName( '__meta/instructions.txt');
 
+        if ( empty( $content ) ) {
+            $content = 'No instructions provided.' ;
+        }
         return $content ;
     }
 
