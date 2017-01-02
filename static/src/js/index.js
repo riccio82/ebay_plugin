@@ -1,3 +1,7 @@
+/**
+ *  REVISE
+ *
+ */
 if ( config.isReview )
 (function ( $, UI, undefined ) {
 
@@ -80,3 +84,35 @@ if ( config.isReview )
 })( jQuery, UI );
 
 
+/**
+ *  TRANSLATE
+ */
+
+if (!config.isReview) {
+
+/**
+ * Skipped segments.
+ * Due to difficulties with count of skipped segments during propagation, here we override
+ * the UI to make sure skipped segments never propagate.
+ */
+
+(function initEbayTranslateForSkippedSegments ($, UI, undefined) {
+
+    var skipped_segment = 'XXXX' ;
+
+    var original_shouldSegmentAutoPropagate = UI.shouldSegmentAutoPropagate;
+
+    $.extend( UI, {
+        shouldSegmentAutoPropagate : function( segment ) {
+            if ( UI.getSegmentTarget( segment ).trim() == skipped_segment ) {
+                return false;
+            }
+            else {
+                return original_shouldSegmentAutoPropagate( segment );
+            }
+        }
+    });
+
+})(jQuery, UI);
+
+}
