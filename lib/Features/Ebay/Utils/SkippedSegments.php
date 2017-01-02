@@ -50,6 +50,15 @@ class SkippedSegments
 
     }
 
+    public static function getDataForStats( Chunks_ChunkStruct $chunk ) {
+        $dao = new \Segments_SegmentDao() ;
+
+        $response = array();
+        $response ['ebay_plugin_total_segments_count']   = $dao->countByChunk( $chunk );
+        $response ['ebay_plugin_skipped_segments_count'] = SkippedSegments::getCount( $chunk ) ;
+        return $response ;
+    }
+
     private static function incrementCount( \Chunks_ChunkStruct $chunk ) {
         $count = self::getCount( $chunk ) ;
         self::setCount( $chunk, $count + 1 ) ;

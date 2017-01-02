@@ -67,6 +67,7 @@ if ( config.isReview )
 
             $('.statistics-core').html( reviewedWords ) ;
 
+            $(document).trigger('setProgress:rendered', { stats : stats } );
 
         }
     } );
@@ -117,6 +118,40 @@ if (!config.isReview) {
         }
     });
 
+
 })(jQuery, UI);
 
 }
+
+/**
+ * Common code for TRANSLATED and REVISE
+ */
+(function initEbayCommon ( $, UI, undefined ) {
+
+    $(document).on('setProgress:rendered', function( e, data ) {
+
+        if (
+            data.stats.ebay_plugin_total_segments_count == undefined ||
+            data.stats.ebay_plugin_skipped_segments_count == undefined
+        ) {
+            return ;
+        }
+
+        var perc = (Math.ceil( data.stats.ebay_plugin_skipped_segments_count / data.stats.ebay_plugin_total_segments_count * 100 ) ) ;
+        var exceededClass = '' ;
+
+        if ( perc >= 5 ) exceededClass = 'blink blink-1';
+        if ( perc > 100 ) perc = 100 ;
+
+        var li = $('<li id="skipped-segments-perc">')
+            .addClass( exceededClass )
+            .append( $('<span>Skipped:</span>') )
+            .append( '&nbsp;' )
+            .append( $('<strong>').text( perc + '%' ) );
+
+        $('.statistics-core').find('#skipped-segments-perc').remove();
+        $('.statistics-core').append( li ) ;
+
+    });
+
+})( jQuery,  UI ) ;
