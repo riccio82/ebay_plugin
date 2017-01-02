@@ -95,6 +95,29 @@ class Ebay extends BaseFeature {
         $projectStructure[ 'metadata' ][ 'word_count_type' ] = \Projects_MetadataDao::WORD_COUNT_RAW;
     }
 
+    public function filterSetTranslationResult( $result, $params ) {
+        $result['ebay_plugin_skipped_segments_count'] = SkippedSegments::getCount( $params['chunk'] );
+        return $result ;
+    }
+
+    public function filterGetSegmentsResult( $result, $params ) {
+        return $result ;
+    }
+
+    public function filterStatsControllerResponse( $response, $params ) {
+        /***
+         * @var \Chunks_ChunkStruct
+         */
+        $chunk = $params['chunk'] ;
+
+        $dao = new \Segments_SegmentDao() ;
+
+        $response['ebay_plugin_total_segments_count'] = $dao->countByChunk( $chunk );
+        $response['ebay_plugin_skipped_segments_count'] = SkippedSegments::getCount( $chunk ) ;
+
+        return $response ;
+    }
+
     private function __setTranslation() {
         $count = \Translations_SegmentTranslationDao::updateEditDistanceForSetTranslation(
                 array(
