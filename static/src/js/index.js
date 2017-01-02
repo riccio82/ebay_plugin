@@ -93,13 +93,17 @@ if (!config.isReview) {
 /**
  * Skipped segments.
  * Due to difficulties with count of skipped segments during propagation, here we override
- * the UI to make sure skipped segments never propagate.
+ * the UI to make sure skipped segments never propagate. This approach is incomplete anyway,
+ * because it does not prevent uncontrolled propagation to happen on the other direction, e.g.
+ *
+ * from abc to XXXX -> propagation may override some stored XXXX segments, with no possibility
+ * for the count to be updated.
+ *
  */
 
 (function initEbayTranslateForSkippedSegments ($, UI, undefined) {
 
-    var skipped_segment = 'XXXX' ;
-
+    var skipped_segment                     = 'XXXX' ;
     var original_shouldSegmentAutoPropagate = UI.shouldSegmentAutoPropagate;
 
     $.extend( UI, {

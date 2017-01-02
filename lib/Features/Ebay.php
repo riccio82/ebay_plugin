@@ -17,6 +17,10 @@ use Teams\TeamDao;
 
 use Exception ;
 
+use Features\Ebay\Utils\SkippedSegments;
+use Translations_SegmentTranslationStruct ;
+use SegmentTranslationModel ;
+
 class Ebay extends BaseFeature {
 
     private $translation;
@@ -77,6 +81,12 @@ class Ebay extends BaseFeature {
         if ( !empty( $this->propagation ) ) {
             $this->__setPropagation();
         }
+
+        SkippedSegments::updateSkippedSegmentsCount(
+            $params['chunk'],
+            $params['old_translation'],
+            $params['translation']
+        ) ;
     }
 
     public function validateProjectCreation( $projectStructure ) {
