@@ -25,7 +25,6 @@ class Ebay extends BaseFeature {
 
     private $translation;
     private $old_translation;
-    private $propagation;
     private $edit_distance;
 
     public static function getHardcodedVar( $name ) {
@@ -73,19 +72,19 @@ class Ebay extends BaseFeature {
 
         $this->translation     = $params[ 'translation' ];
         $this->old_translation = $params[ 'old_translation' ];
-        $this->propagation     = $params[ 'propagation' ];
         $this->edit_distance   = $this->getEditDistance();
 
         $this->__setTranslation();
 
-        if ( !empty( $this->propagation ) ) {
+        if ( ! $params['propagated_ids'] ) {
             $this->__setPropagation();
         }
 
         SkippedSegments::updateSkippedSegmentsCount(
             $params['chunk'],
             $params['old_translation'],
-            $params['translation']
+            $params['translation'],
+            $params['propagated_ids']
         ) ;
     }
 
@@ -289,6 +288,18 @@ class Ebay extends BaseFeature {
         $metadata = array_filter( $metadata );
 
         return  $metadata ;
+    }
+
+    public function postJobMerged( $projectStructure ) {
+        $id_job = $projectStructure[ 'job_to_merge' ];
+
+        $chunk = \Chunks_ChunkDao::getByJobID( $id_job ) [ 0 ] ;
+        SkippedSegments::postJobMerged( $chunk ) ;
+
+    }
+
+    public function postJobSplitted( $projectStructure ) {
+        SkippedSegments::postJobSplitted( $projectStructure['job_to_split'], $projectStructure['job_to_split_pass'] ) ;
     }
 
     /**

@@ -84,45 +84,6 @@ if ( config.isReview )
 
 })( jQuery, UI );
 
-
-/**
- *  TRANSLATE
- */
-
-if (!config.isReview) {
-
-/**
- * Skipped segments.
- * Due to difficulties with count of skipped segments during propagation, here we override
- * the UI to make sure skipped segments never propagate. This approach is incomplete anyway,
- * because it does not prevent uncontrolled propagation to happen on the other direction, e.g.
- *
- * from abc to XXXX -> propagation may override some stored XXXX segments, with no possibility
- * for the count to be updated.
- *
- */
-
-(function initEbayTranslateForSkippedSegments ($, UI, undefined) {
-
-    var skipped_segment                     = 'XXXX' ;
-    var original_shouldSegmentAutoPropagate = UI.shouldSegmentAutoPropagate;
-
-    $.extend( UI, {
-        shouldSegmentAutoPropagate : function( segment ) {
-            if ( UI.getSegmentTarget( segment ).trim() == skipped_segment ) {
-                return false;
-            }
-            else {
-                return original_shouldSegmentAutoPropagate( segment );
-            }
-        }
-    });
-
-
-})(jQuery, UI);
-
-}
-
 /**
  * Common code for TRANSLATED and REVISE
  */
@@ -137,7 +98,9 @@ if (!config.isReview) {
             return ;
         }
 
-        var perc = (Math.ceil( data.stats.ebay_plugin_skipped_segments_count / data.stats.ebay_plugin_total_segments_count * 100 ) ) ;
+        var perc = data.stats.ebay_plugin_skipped_segments_count / data.stats.ebay_plugin_total_segments_count * 100 ;
+        perc = Math.round( perc * 100 ) / 100 ;
+
         var exceededClass = '' ;
 
         if ( perc >= 5 ) exceededClass = 'blink blink-1';
