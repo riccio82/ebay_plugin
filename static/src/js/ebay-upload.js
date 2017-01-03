@@ -19,4 +19,8 @@
         }
 
     })
+
+    $(function() {
+        $( "#ebay_due_date" ).datepicker();
+    });
 })(jQuery, APP);
