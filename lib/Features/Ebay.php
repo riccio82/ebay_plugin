@@ -216,6 +216,18 @@ class Ebay extends BaseFeature {
     }
 
     /**
+     * If segment is marked as skipped, do no send contribution
+     *
+     * @param $new_translation
+     * @param $old_translation
+     *
+     * @return bool
+     */
+    public function filter_skip_set_contribution( $skip_set_contribution, $new_translation, $old_translation ) {
+        return ( SkippedSegments::isSkipped( $new_translation ) );
+    }
+
+    /**
      * Ignore all glossaries. Temporary hack to avoid something unknown on MyMemory side.
      * We simply change the array_files key to avoid any glossary to be sent to MyMemory.
      *

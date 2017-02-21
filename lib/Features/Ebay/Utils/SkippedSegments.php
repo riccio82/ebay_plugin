@@ -139,7 +139,7 @@ class SkippedSegments
         self::setSkippedIds( $chunk, $new_list ) ;
     }
 
-    private static function isSkipped( $translation ) {
+    public static function isSkipped( $translation ) {
         return $translation['translation'] == self::SKIPPED_SEGMENT ;
     }
 
