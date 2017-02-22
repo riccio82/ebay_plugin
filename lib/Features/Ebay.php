@@ -288,16 +288,19 @@ class Ebay extends BaseFeature {
     }
 
     /**
-     * This filter is necessary to assign input params to the metadata array when post comes from UI.
+     * This filter is necessary to assign input params to the
+     * metadata array when post comes from UI.
      *
      * @param $metadata
      * @param $options
+     *
+     * @return array
      */
     public function createProjectAssignInputMetadata( $metadata, $options ) {
         $options = \Utils::ensure_keys( $options, array('input'));
 
         $metadata = array_intersect_key( $options['input'], array_flip( Metadata::$keys ) ) ;
-        $metadata = array_filter( $metadata );
+        $metadata = array_filter( $metadata ); // <-- remove all `empty` array elements
 
         return  $metadata ;
     }
