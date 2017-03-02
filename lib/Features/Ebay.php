@@ -222,4 +222,14 @@ class Ebay extends BaseFeature {
     }
 
 
+    /**
+     * Ebay customisation requires that identical source and target are considered identical
+     */
+    public function filterIdenticalSourceAndTargetIsTranslated($originalValue) {
+        return true ;
+    }
+
+    public function getDependencies() {
+    }
+
 }
