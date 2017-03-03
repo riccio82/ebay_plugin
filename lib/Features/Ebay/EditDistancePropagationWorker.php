@@ -14,9 +14,13 @@ use TaskRunner\Commons\AbstractElement;
 use TaskRunner\Commons\QueueElement ;
 
 class EditDistancePropagationWorker extends AbstractWorker {
-    protected $_queueHandler;
 
     public function process( AbstractElement $queueElement ) {
+
+        /**
+         * @var $queueElement QueueElement
+         */
+        $this->_checkForReQueueEnd($queueElement) ;
 
         $this->_checkDatabaseConnection();
 
@@ -28,7 +32,4 @@ class EditDistancePropagationWorker extends AbstractWorker {
 
     }
 
-    protected function _checkForReQueueEnd( QueueElement $queueElement ){
-
-    }
 }
