@@ -12,6 +12,9 @@ namespace Features;
 use Exceptions\ValidationError;
 
 use Features\Ebay\Utils\Routes as Routes ;
+use Teams\TeamDao;
+
+use Exception ;
 
 class Ebay extends BaseFeature {
 
@@ -19,6 +22,15 @@ class Ebay extends BaseFeature {
     private $old_translation;
     private $propagation;
     private $edit_distance;
+
+    public static function getHardcodedVar( $name ) {
+        if ( \INIT::$ENV == 'production' ) {
+            $map = array( 'team_id' => 32785 );
+        } else {
+            $map = array( 'team_id' => 7 );
+        }
+        return $map[ $name ] ;
+    }
 
     public function postProjectCreate( $projectStructure ) {
         $projectStructure[ 'result' ][ 'analyze_url' ] = Routes::analyze( array(
@@ -171,6 +183,18 @@ class Ebay extends BaseFeature {
     }
 
 
+    public function filter_get_projects_team( $team ) {
+        return static::getTeam();
+    }
+
+    public function filter_team_for_project_creation( $team ) {
+        if ( is_null( $team ) ) {
+            return static::getTeam();
+        } else {
+            return $team ;
+        }
+    }
+
     /**
      * Ignore all glossaries. Temporary hack to avoid something unknown on MyMemory side.
      * We simply change the array_files key to avoid any glossary to be sent to MyMemory.
@@ -230,6 +254,14 @@ class Ebay extends BaseFeature {
     }
 
     public function getDependencies() {
+    }
+
+    private static function getTeam() {
+        $team = ( new TeamDao() )->findById( self::getHardcodedVar( 'team_id' ) );
+        if ( !$team ) {
+            throw new Exception('Team not found');
+        }
+        return $team ;
     }
 
 }
