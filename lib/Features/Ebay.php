@@ -27,15 +27,6 @@ class Ebay extends BaseFeature {
     private $old_translation;
     private $edit_distance;
 
-    public static function getHardcodedVar( $name ) {
-        if ( \INIT::$ENV == 'production' ) {
-            $map = array( 'team_id' => 32785 );
-        } else {
-            $map = array( 'team_id' => 7 );
-        }
-        return $map[ $name ] ;
-    }
-
     public function postProjectCreate( $projectStructure ) {
         $projectStructure[ 'result' ][ 'analyze_url' ] = Routes::analyze( array(
                 'project_name' => $projectStructure[ 'project_name' ],
@@ -202,19 +193,6 @@ class Ebay extends BaseFeature {
         $stmt->execute( array( $result['id'] ) ) ;
     }
 
-
-    public function filter_get_projects_team( $team ) {
-        return static::getTeam();
-    }
-
-    public function filter_team_for_project_creation( $team ) {
-        if ( is_null( $team ) ) {
-            return static::getTeam();
-        } else {
-            return $team ;
-        }
-    }
-
     /**
      * If segment is marked as skipped, do no send contribution
      *
@@ -325,14 +303,6 @@ class Ebay extends BaseFeature {
     }
 
     public function getDependencies() {
-    }
-
-    private static function getTeam() {
-        $team = ( new TeamDao() )->findById( self::getHardcodedVar( 'team_id' ) );
-        if ( !$team ) {
-            throw new Exception('Team not found');
-        }
-        return $team ;
     }
 
 }
