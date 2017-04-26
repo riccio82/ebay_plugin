@@ -188,7 +188,7 @@
     <div class="wrapper word-count-left">
         <tal:block tal:define="id_for_job php:array()" tal:repeat="id_for_job jobs">
 
-            <div tal:attributes="data-jid string:${repeat/id_for_job/key}; class string:jobcontainer ${id_for_job/splitted}">
+            <div tal:attributes="data-jid string:${repeat/id_for_job/key}; class string:jobcontainer ${id_for_job/splitted}; style string:display:none;">
                 <div tal:define="splitted id_for_job/splitted">
 
                     <h3>
@@ -340,6 +340,19 @@
     $(".currencychange").click(function() {
         $(this).hide();
         $("#changecurrency").show();
+    });
+
+    /**
+     * This part removes the word count from the job split panel.
+     * To do that and avoid flickering we've set display:none on .jobcontainer, then we hide wc with jquery and
+     * then we restore the visibility of .jobcontainer.
+     */
+    $(document).ready( function() {
+        $('.jobcontainer .tablestats thead, td.stat-total').hide();
+    });
+
+    $(document).ready( function() {
+        $('.jobcontainer').show();
     });
 </script>
 <!-- FINE POPUP LOGIN -->
