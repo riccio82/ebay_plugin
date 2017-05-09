@@ -5,7 +5,7 @@
     <title>Volume Analysis - MateCat</title>
     <meta name="description" content="MateCat allows you to get more matches than any other CAT tool."/>
     <meta name="viewport" content="width=device-width"/>
-    <link href="${basepath}public/css/common.css?build=${build_number}" rel="stylesheet" type="text/css"/>
+    <link href="${basepath}public/css/build/common.css?build=${build_number}" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="${basepath}public/css/analyze.css?build=${build_number}"/>
     <link rel="stylesheet" href="${basepath}public/css/popup.css?build=${build_number}"/>
 
@@ -96,7 +96,7 @@
     <script type="text/javascript" src="${basepath}public/js/lib/jquery.cookie.js"></script>
     <script type="text/javascript" src="${basepath}public/js/build/common.js?build=${build_number}"></script>
     <script type="text/javascript" src="${basepath}public/js/analyze.js?build=${build_number}"></script>
-    <script type="text/javascript" src="${basepath}public/js/outsource.js?build=${build_number}"></script>
+    <!--<script type="text/javascript" src="${basepath}public/js/outsource.js?build=${build_number}"></script>-->
 
     <script src="${basepath}public/js/build/react.js?build=${build_number}"></script>
     <script src="${basepath}public/js/build/cat-react.js?build=${build_number}"></script>
@@ -111,6 +111,8 @@
 <header>
     <div class="wrapper">
         <a href="${basepath}" class="logo"></a>
+        <div metal:use-macro="${php: INIT::$TEMPLATE_ROOT}/common.html/login_includes" />
+
     </div>
 </header>
 
@@ -325,8 +327,6 @@
                 <li><a href="https://www.matecat.com/support/" target="_blank">Support</a></li>
             </ul>
 
-            <div metal:use-macro="${php: INIT::$TEMPLATE_ROOT}/common.html/login_includes" />
-
         </nav>
 
     </div>
@@ -364,6 +364,5 @@
 
 
 <div metal:use-macro="${php: INIT::$TEMPLATE_ROOT}/common.html/footer_includes" />
-
 </body>
 </html>

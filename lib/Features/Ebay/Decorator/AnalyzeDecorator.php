@@ -13,6 +13,8 @@ use AbstractModelViewDecorator ;
 use Analysis\Status;
 use INIT ;
 use DateTime ;
+use Features\Ebay\Utils\Routes ;
+
 
 class AnalyzeDecorator extends AbstractModelViewDecorator {
 
@@ -86,6 +88,8 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
 
         $template->daemon_misconfiguration = var_export( $misconfiguration, true );
         $template->project_data = $this->getProjectData() ;
+
+        $template->append('footer_js', Routes::staticSrc('js/ebay-analyze.js') );
     }
 
     private function getProjectData() {
