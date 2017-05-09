@@ -8,18 +8,14 @@
 
 namespace Features;
 
-
 use Exceptions\ValidationError;
 
 use Features\Ebay\Utils\Metadata;
 use Features\Ebay\Utils\Routes as Routes ;
-use Teams\TeamDao;
-
-use Exception ;
+use LQA\ChunkReviewStruct;
 
 use Features\Ebay\Utils\SkippedSegments;
-use Translations_SegmentTranslationStruct ;
-use SegmentTranslationModel ;
+use Features ;
 
 class Ebay extends BaseFeature {
 
@@ -281,6 +277,23 @@ class Ebay extends BaseFeature {
         $metadata = array_filter( $metadata ); // <-- remove all `empty` array elements
 
         return  $metadata ;
+    }
+
+    /**
+     * @param $event ChunkReviewStruct
+     */
+    public function project_completion_event_saved( $chunk, $params, $lastId ) {
+        $project = $chunk->getProject() ;
+
+        if ( in_array( Features::REVIEW_IMPROVED, $project->getFeatures()->getCodes() ) ) {
+            // reload quality report and dump it to file
+            $quality_report = new Features\ReviewImproved\Model\QualityReportModel( $chunk ) ;
+            $structure = $quality_report->getStructure();
+
+            $this->getLogger()->info( "ChunkCompletionEvent LASTID: $lastId" );
+            $this->getLogger()->info( json_encode( $params ) ) ;
+            $this->getLogger()->info( json_encode( $structure ) ) ;
+        }
     }
 
     public function postJobMerged( $projectStructure ) {
