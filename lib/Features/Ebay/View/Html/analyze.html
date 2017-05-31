@@ -163,11 +163,6 @@
                     <td tal:content="project_data/file_name"></td>
                 </tr>
                 <tr>
-                    <th>Word count</th>
-                    <td tal:content="project_data/word_count"></td>
-                </tr>
-
-                <tr>
                     <th>Due date</th>
                     <td tal:content="project_data/due_date"></td>
                 </tr>
@@ -190,7 +185,7 @@
     <div class="wrapper word-count-left">
         <tal:block tal:define="id_for_job php:array()" tal:repeat="id_for_job jobs">
 
-            <div tal:attributes="data-jid string:${repeat/id_for_job/key}; class string:jobcontainer ${id_for_job/splitted}; style string:display:none;">
+            <div tal:attributes="data-jid string:${repeat/id_for_job/key}; class string:jobcontainer ${id_for_job/splitted}">
                 <div tal:define="splitted id_for_job/splitted">
 
                     <h3>
@@ -395,21 +390,6 @@
     $(".currencychange").click(function() {
         $(this).hide();
         $("#changecurrency").show();
-    });
-
-    /**
-     * This part removes the word count from the job split panel.
-     * To do that and avoid flickering we've set display:none on .jobcontainer, then we hide wc with jquery and
-     * then we restore the visibility of .jobcontainer.
-     */
-    $(document).ready( function() {
-        $('.jobcontainer .tablestats thead, td.stat-total').hide();
-    });
-
-    $(document).ready( function() {
-        $('.jobcontainer').show();
-        // This hides the wordsum from the split modal window as per Alan's request.
-        $('.wordsum').hide();
     });
 </script>
 <!-- FINE POPUP LOGIN -->
