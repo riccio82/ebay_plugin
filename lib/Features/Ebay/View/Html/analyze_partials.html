@@ -30,6 +30,8 @@
                 <td class="empty">
                     <a tal:attributes="href string:${basepath}translate/${pname}/${job/source_short}-${job/target_short}/${job/jid}-${job/jpassword}" href="#" target="_blank" class="uploadbtn translate">Translate</a>
                 </td>
+
+                <td class="empty undoCompleteBtnContainer"></td>
             </tr>
             <tal:block tal:define="files job/files; f php:array()" tal:repeat="f files">
                 <tr tal:attributes="id string:file_${job/jid}_${job/jpassword}_${f/id}" id="file_1703" class="subfile part3files">
@@ -40,6 +42,7 @@
                     </td>
                     <td class="stat-total" tal:content="f/file_raw_word_count">7,500</td>
 
+                    <td class="empty"></td>
                     <td class="empty"></td>
                 </tr>
 
