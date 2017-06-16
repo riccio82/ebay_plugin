@@ -20,7 +20,8 @@
             support_mail: '${support_mail}',
             id_project: '${pid}',
             password: '${project_password}',
-            split_based_on_raw_word_count : true
+            split_based_on_raw_word_count : true,
+            project_completion_timestamp : ${project_data/project_completion_timestamp | string: null }
         };
     </script>
 
@@ -145,10 +146,23 @@
         </div>
     </div>
 
+
+
+
     <div class="wrapper instructions">
+
+
+        <div class="completion-info">
+            <h4> Completion </h4>
+            <p>
+                Project can be completed
+                <a href="#" class="standardbtn disabled completeProjectButton" >Complete project</a>
+            </p>
+        </div>
 
         <div class="instructions-txt">
             <h4>Instructions</h4>
+
             <p tal:content="project_data/instructions">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ac diam sit amet quam vehicula elementum
                 sed sit amet dui. Proin eget tortor risus. Sed porttitor lectus nibh. Vivamus magna justo, lacinia eget cons

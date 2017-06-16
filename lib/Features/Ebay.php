@@ -13,6 +13,7 @@ use Exceptions\ValidationError;
 
 use Features\Ebay\Utils\Metadata;
 use Features\Ebay\Utils\Routes as Routes ;
+use Klein\Klein;
 use LQA\ChunkReviewStruct;
 
 use Features\Ebay\Utils\SkippedSegments;
@@ -23,6 +24,8 @@ class Ebay extends BaseFeature {
     private $translation;
     private $old_translation;
     private $edit_distance;
+
+    const PROJECT_COMPLETION_METADATA_KEY = 'ebay_project_completed_at';
 
     public function postProjectCreate( $projectStructure ) {
         $projectStructure[ 'result' ][ 'analyze_url' ] = Routes::analyze( array(
@@ -238,18 +241,27 @@ class Ebay extends BaseFeature {
         return $status;
     }
 
-    public static function loadRoutes( \Klein\Klein $klein ) {
-        $klein->respond( 'GET', '/analyze/[:name]/[:id_project]-[:password]', function ( $request, $response, $service ) {
-            $controller    = new Ebay\Controller\AnalyzeController( $request, $response, $service );
-            $template_path = dirname( __FILE__ ) . '/Ebay/View/Html/analyze.html';
-            $controller->setView( $template_path );
-            $controller->respond();
-        } );
+    public static function loadRoutes( Klein $klein ) {
+        $klein->respond( 'GET', '/analyze/[:name]/[:id_project]-[:password]',              [__CLASS__, 'analyzeRoute'] );
+        $klein->respond( 'GET', '/reference-files/[:id_project]/[:password]/[:zip_index]', [__CLASS__, 'referenceFilesRoute' ] );
+        $klein->respond( 'POST', '/projects/[:id_project]/[:password]/completion',         [__CLASS__, 'setProjectCompletedRoute' ] ) ;
+    }
 
-        $klein->respond( 'GET', '/reference-files/[:id_project]/[:password]/[:zip_index]', function ( $request, $response, $service ) {
-            $controller    = new Ebay\Controller\ReferenceFilesController( $request, $response, $service );
-            $controller->downloadFile();
-        } );
+    public static function analyzeRoute($request, $response, $service, $app) {
+        $controller    = new Ebay\Controller\AnalyzeController( $request, $response, $service );
+        $template_path = dirname( __FILE__ ) . '/Ebay/View/Html/analyze.html';
+        $controller->setView( $template_path );
+        $controller->respond();
+    }
+
+    public static function referenceFilesRoute($request, $response, $service, $app) {
+        $controller    = new Ebay\Controller\ReferenceFilesController( $request, $response, $service );
+        $controller->downloadFile();
+    }
+
+    public static function setProjectCompletedRoute( $request, $response, $service, $app ) {
+        $controller = new Features\Ebay\Controller\ProjectCompletionController($request, $response, $service );
+        $controller->setCompletion() ;
     }
 
     /**

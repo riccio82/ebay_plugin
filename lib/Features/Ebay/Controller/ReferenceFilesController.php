@@ -9,6 +9,8 @@
 namespace Features\Ebay\Controller;
 
 use Files_FileDao;
+use Klein\Request;
+use Klein\Response;
 use ZipArchiveExtended;
 use ZipArchive;
 
@@ -23,7 +25,7 @@ class ReferenceFilesController {
     private $request;
 
 
-    public function __construct( \Klein\Request $request, \Klein\Response $response, $service ) {
+    public function __construct( Request $request, Response $response, $service ) {
         $this->request  = $request;
         $this->response = $response;
         $this->service  = $service;
