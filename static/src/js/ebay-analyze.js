@@ -7,7 +7,18 @@ $.extend( UI, {
 
 function precomputeOutsourceQuotes() {} ;
 
+
+
+
 $(function() {
+
+    var uncompletableBecauseAlreadyCompleted = 1 ;
+    var uncompletableForMissingCompletedChunks = 2 ;
+    var completableForMissingCompletionDate = 3 ;
+    var completableBecauseRecompledChunks = 4 ;
+
+    currentStatus = null ;
+
     $( '.mergebtn, .splitbtn' ).removeClass( 'disabled' );
 
     function clickUndo(e) {
@@ -32,7 +43,7 @@ $(function() {
                 element = null ;
 
             if ( item.completed ) {
-                element = $('<a href="#" class="standardbtn undoCompleteBtn">Undo complete</a>')
+                element = $('<a href="#" class="standardbtn undoCompleteBtn">Undo</a>')
                     .data('powertip', sprintf(' Completed on %s', moment(  item.completed_at ).format('LLL') ) )
                     .data('event_id', item.event_id)
                     .on('click', clickUndo )
@@ -41,24 +52,25 @@ $(function() {
             }
 
             else {
-                element = $('<a href="#" class="standardbtn undoCompleteBtn disabled">Undo complete</a>') ;
+                element = $('<a href="#" class="standardbtn undoCompleteBtn disabled">waiting</a>') ;
             }
 
             cell.append( element ) ;
         });
     }
 
-    function shouldButtonBeEnalbed( data ) {
+
+    function setCurrentStatus( data ) {
         var completedChunks = _.filter( data.project_status.translate, function( item ) {
             return item.completed_at != null ;
         });
 
         if ( completedChunks.length != data.project_status.translate.length ) {
-            return false ;
+            currentStatus = uncompletableForMissingCompletedChunks ;
         }
 
         if ( config.project_completion_timestamp === null ) {
-            return true ;
+            currentStatus = completableForMissingCompletionDate ;
         }
 
         mostRecentChunkCompletion = _.map( completedChunks, function( item ) {
@@ -69,22 +81,45 @@ $(function() {
             moment( mostRecentChunkCompletion * 1000 ).format('x') >
             moment( config.project_completion_timestamp * 1000 ).format('x')
         ) {
-            return true ;
+            currentStatus = completableBecauseRecompledChunks ;
         }
         else {
-            return false ;
+            currentStatus = uncompletableBecauseAlreadyCompleted ;
         }
     }
 
-    function enableProjectCompletionButtonByData( data ) {
-        if ( shouldButtonBeEnalbed( data ) ) {
+    function enableProjectCompletionButtonByData( ) {
+        if ( currentStatus == completableBecauseRecompledChunks || currentStatus == completableForMissingCompletionDate ) {
             $('.completeProjectButton').removeClass('disabled');
         }
     }
 
+    function getExplanatoryText() {
+
+        switch( currentStatus ) {
+            case completableBecauseRecompledChunks :
+                return 'All chunks completed, you can now complete this project' ;
+            case completableForMissingCompletionDate :
+                return 'All chunks completed, you can now complete this project' ;
+            case uncompletableBecauseAlreadyCompleted :
+                return 'This project was already completed' ;
+            case uncompletableForMissingCompletedChunks :
+                return 'Not all chunks have been marked as complete yet.' ;
+            default :
+                throw 'invalid value for currentStatus' ;
+        }
+    }
+
+    function displayMessage() {
+        $('.completableStatus').text( getExplanatoryText()  );
+    }
+
     function dataLoaded( data ) {
+        setCurrentStatus( data )
+
         drawButtonsByData( data ) ;
-        enableProjectCompletionButtonByData( data ) ;
+        enableProjectCompletionButtonByData(  ) ;
+        displayMessage() ;
     }
 
     $(document).on('click', '.completeProjectButton', function(e) {
@@ -94,7 +129,6 @@ $(function() {
         var path = sprintf('/plugins/ebay/projects/%s/%s/completion', config.id_project, config.password ) ;
         $.post( path, {} ).done( function() {
 
-            disableButtons() ;
             $('.undoCompleteBtn').addClass('disabled');
             $(e.target).addClass('disabled');
         });
