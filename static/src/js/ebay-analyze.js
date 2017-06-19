@@ -116,25 +116,42 @@ $(function() {
 
     function dataLoaded( data ) {
         setCurrentStatus( data )
-
         drawButtonsByData( data ) ;
+
         enableProjectCompletionButtonByData(  ) ;
         displayMessage() ;
     }
+
+    function completeProjectConfirmed() {
+        var path = sprintf('/plugins/ebay/projects/%s/%s/completion', config.id_project, config.password ) ;
+
+        $.post( path, {} )
+            .done( function() {
+                $('.undoCompleteBtn').addClass('disabled');
+                $('.completeProjectButton').addClass('disabled');
+
+                currentStatus = uncompletableBecauseAlreadyCompleted;
+                displayMessage() ;
+            }) ;
+    }
+
+    UI.completeProjectConfirmed = completeProjectConfirmed ;
 
     $(document).on('click', '.completeProjectButton', function(e) {
         e.preventDefault();
         if ( $(e.target).hasClass('disabled') ) return ;
 
-        var path = sprintf('/plugins/ebay/projects/%s/%s/completion', config.id_project, config.password ) ;
-        $.post( path, {} ).done( function() {
-
-            $('.undoCompleteBtn').addClass('disabled');
-            $(e.target).addClass('disabled');
+        APP.confirm({
+            msg: 'Are you sure you want to make the whole project as completed? This action cannot canceled.',
+            callback: 'completeProjectConfirmed'
         });
     });
 
-    $.get('/api/v2/projects/' + config.id_project + '/' + config.password + '/completion_status')
-        .done( dataLoaded  );
+    function loadCompletionData() {
+        return $.get('/api/v2/projects/' + config.id_project + '/' + config.password + '/completion_status')
+                .done( dataLoaded ) ;
+    }
+
+    loadCompletionData() ;
 
 });
