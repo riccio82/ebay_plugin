@@ -7,15 +7,12 @@ $.extend( UI, {
 
 function precomputeOutsourceQuotes() {} ;
 
-
-
-
 $(function() {
 
-    var uncompletableBecauseAlreadyCompleted = 1 ;
-    var uncompletableForMissingCompletedChunks = 2 ;
-    var completableForMissingCompletionDate = 3 ;
-    var completableBecauseRecompledChunks = 4 ;
+    var STATUS_COMPLETED = 'completed' ;
+    var STATUS_NON_COMPLETED = 'non_completed';
+    var STATUS_RECOMPLETABLE = 'recompletable' ;
+    var STATUS_MISSING_COMPLETED_CHUNKS = 'missing_completed_chunks' ;
 
     currentStatus = null ;
 
@@ -31,6 +28,7 @@ $(function() {
                 jid, password, $(e.target).data('event_id') )
         }).done( function() {
             $(e.target).remove();
+            reloadStatusFromServer() ;
         });
     }
 
@@ -59,51 +57,24 @@ $(function() {
         });
     }
 
-
-    function setCurrentStatus( data ) {
-        var completedChunks = _.filter( data.project_status.translate, function( item ) {
-            return item.completed_at != null ;
-        });
-
-        if ( completedChunks.length != data.project_status.translate.length ) {
-            currentStatus = uncompletableForMissingCompletedChunks ;
-        }
-
-        if ( config.project_completion_timestamp === null ) {
-            currentStatus = completableForMissingCompletionDate ;
-        }
-
-        mostRecentChunkCompletion = _.map( completedChunks, function( item ) {
-            return moment( item.completed_at ).format('x');
-        }).sort().reverse()[ 0 ] ;
-
-        if (
-            moment( mostRecentChunkCompletion * 1000 ).format('x') >
-            moment( config.project_completion_timestamp * 1000 ).format('x')
-        ) {
-            currentStatus = completableBecauseRecompledChunks ;
-        }
-        else {
-            currentStatus = uncompletableBecauseAlreadyCompleted ;
-        }
-    }
-
     function enableProjectCompletionButtonByData( ) {
-        if ( currentStatus == completableBecauseRecompledChunks || currentStatus == completableForMissingCompletionDate ) {
+        if ( currentStatus == STATUS_NON_COMPLETED || currentStatus == STATUS_RECOMPLETABLE ) {
             $('.completeProjectButton').removeClass('disabled');
+        } else {
+            $('.completeProjectButton').addClass('disabled');
         }
     }
 
     function getExplanatoryText() {
 
         switch( currentStatus ) {
-            case completableBecauseRecompledChunks :
+            case STATUS_NON_COMPLETED :
                 return 'All chunks completed, you can now complete this project' ;
-            case completableForMissingCompletionDate :
+            case STATUS_RECOMPLETABLE :
                 return 'All chunks completed, you can now complete this project' ;
-            case uncompletableBecauseAlreadyCompleted :
+            case STATUS_COMPLETED :
                 return 'This project was already completed' ;
-            case uncompletableForMissingCompletedChunks :
+            case STATUS_MISSING_COMPLETED_CHUNKS :
                 return 'Not all chunks have been marked as complete yet.' ;
             default :
                 throw 'invalid value for currentStatus' ;
@@ -115,22 +86,19 @@ $(function() {
     }
 
     function dataLoaded( data ) {
-        setCurrentStatus( data )
         drawButtonsByData( data ) ;
-
-        enableProjectCompletionButtonByData(  ) ;
-        displayMessage() ;
+        return ( new $.Deferred() ).resolve() ;
     }
 
     function completeProjectConfirmed() {
         var path = sprintf('/plugins/ebay/projects/%s/%s/completion', config.id_project, config.password ) ;
 
         $.post( path, {} )
-            .done( function() {
+            .done( function(data) {
                 $('.undoCompleteBtn').addClass('disabled');
                 $('.completeProjectButton').addClass('disabled');
 
-                currentStatus = uncompletableBecauseAlreadyCompleted;
+                currentStatus = STATUS_COMPLETED ;
                 displayMessage() ;
             }) ;
     }
@@ -147,11 +115,22 @@ $(function() {
         });
     });
 
+    function reloadStatusFromServer() {
+        return $.get('/plugins/ebay/projects/' + config.id_project + '/' + config.password + '/completion_status' )
+            .done( function( data ) {
+                currentStatus = data.status ;
+
+                enableProjectCompletionButtonByData(  ) ;
+                displayMessage() ;
+            });
+    };
+
     function loadCompletionData() {
-        return $.get('/api/v2/projects/' + config.id_project + '/' + config.password + '/completion_status')
-                .done( dataLoaded ) ;
+        return $.get('/api/v2/projects/' + config.id_project + '/' + config.password + '/completion_status' )
+            .done( dataLoaded )
+            .done( reloadStatusFromServer ) ;
     }
 
-    loadCompletionData() ;
+    loadCompletionData();
 
 });
