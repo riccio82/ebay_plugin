@@ -48,7 +48,7 @@ class ProjectCompletionStatusModel {
             return self::STATUS_NON_COMPLETED ;
         }
 
-        if ( $this->mostRecentCompletedTranslation()['create_date'] > $project_completion_date) {
+        if ( strtotime($this->mostRecentCompletedTranslation()['completed_at']) > (int) $project_completion_date) {
             return self::STATUS_RECOMPLETABLE ;
         }
         else {
@@ -65,12 +65,13 @@ class ProjectCompletionStatusModel {
     }
 
     public function mostRecentCompletedTranslation() {
-        $sorted = usort( $this->getCompleteTranslateChunks(), function( $item1, $item2 ) {
-            if ( $item1['create_date'] == $item2['create_date'] ) return 0 ;
-            return ( $item1['create_date'] > $item2['create_date'] ) ? 1 : -1 ;
+        $completed = $this->getCompleteTranslateChunks() ;
+        usort( $completed , function( $item1, $item2 ) {
+            if ( $item1['completed_at'] == $item2['completed_at'] ) return 0 ;
+            return ( $item1['completed_at'] > $item2['completed_at'] ) ? 1 : -1 ;
         });
 
-        return $sorted[0];
+        return $completed[0];
     }
 
     public function getCompleteTranslateChunks() {
