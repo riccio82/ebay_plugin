@@ -104,6 +104,7 @@ $(function() {
                 $('.completeProjectButton').addClass('disabled');
 
                 currentStatus = STATUS_COMPLETED ;
+                completionDate = new Date();
                 displayMessage() ;
             }) ;
     }
