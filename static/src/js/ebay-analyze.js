@@ -25,9 +25,12 @@ $(function() {
         $.ajax({
             type: 'DELETE',
             url: sprintf('/api/app/jobs/%s/%s/completion-events/%s',
-                jid, password, $(e.target).data('event_id') )
+                jid, password, $(e.currentTarget).find('a').data('event_id') )
         }).done( function() {
-            $(e.target).remove();
+            var cell = $(e.currentTarget).closest('td');
+            $(e.currentTarget).remove();
+            element = $('<span class="job-undoComplete-label">Not Completed yet</span>') ;
+            cell.append(element);
             reloadStatusFromServer() ;
         });
     }
@@ -41,16 +44,15 @@ $(function() {
                 element = null ;
 
             if ( item.completed ) {
-                element = $('<a href="#" class="standardbtn undoCompleteBtn">Undo</a>')
-                    .data('powertip', sprintf(' Completed on %s', moment(  item.completed_at ).format('LLL') ) )
-                    .data('event_id', item.event_id)
+                element = $('<div><a data-event_id="'+ item.event_id +'" href="#" class="standardbtn undoCompleteBtn">Undo Complete</a><span class="job-completed-label">' + sprintf(' Completed on %s', moment(  item.completed_at ).format('LLL') )+ '</span></div>')
+                    // .data('powertip', sprintf(' Completed on %s', moment(  item.completed_at ).format('LLL') ) )
                     .on('click', clickUndo )
-                    .powerTip()
-
+                    // .powerTip()
+                cell.addClass("completed");
             }
 
             else {
-                element = $('<a href="#" class="standardbtn undoCompleteBtn disabled">waiting</a>') ;
+                element = $('<span class="job-undoComplete-label">Not Completed yet</span>') ;
             }
 
             cell.append( element ) ;
@@ -58,7 +60,10 @@ $(function() {
     }
 
     function enableProjectCompletionButtonByData( ) {
-        if ( currentStatus == STATUS_NON_COMPLETED || currentStatus == STATUS_RECOMPLETABLE ) {
+        if (currentStatus === STATUS_COMPLETED) {
+            $('.completeProjectButton').addClass('disabled');
+            $('.undoCompleteBtn').addClass('disabled');
+        } else if ( currentStatus == STATUS_NON_COMPLETED || currentStatus == STATUS_RECOMPLETABLE ) {
             $('.completeProjectButton').removeClass('disabled');
         } else {
             $('.completeProjectButton').addClass('disabled');
