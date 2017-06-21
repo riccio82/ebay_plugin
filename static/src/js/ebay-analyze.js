@@ -116,7 +116,7 @@ $(function() {
     });
 
     function reloadStatusFromServer() {
-        return $.get('/plugins/ebay/projects/' + config.id_project + '/' + config.password + '/completion_status' )
+        return $.get('/plugins/ebay/api/v1/projects/' + config.id_project + '/' + config.password + '/completion_status' )
             .done( function( data ) {
                 currentStatus = data.status ;
 

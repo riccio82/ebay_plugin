@@ -251,7 +251,7 @@ class Ebay extends BaseFeature {
         $klein->respond( 'GET', '/analyze/[:name]/[:id_project]-[:password]',              [__CLASS__, 'analyzeRoute'] );
         $klein->respond( 'GET', '/reference-files/[:id_project]/[:password]/[:zip_index]', [__CLASS__, 'referenceFilesRoute' ] );
         $klein->respond( 'POST', '/projects/[:id_project]/[:password]/completion',         [__CLASS__, 'setProjectCompletedRoute' ] ) ;
-        $klein->respond( 'GET', '/projects/[:id_project]/[:password]/completion_status',         [__CLASS__, 'getCompletionRoute' ] ) ;
+        $klein->respond( 'GET', '/api/v1/projects/[:id_project]/[:password]/completion_status',         [__CLASS__, 'getCompletionRoute' ] ) ;
     }
 
     public static function analyzeRoute($request, $response, $service, $app) {
@@ -267,13 +267,13 @@ class Ebay extends BaseFeature {
     }
 
     public static function setProjectCompletedRoute( $request, $response, $service, $app ) {
-        $controller = new Features\Ebay\Controller\ProjectCompletionController($request, $response, $service );
-        $controller->setCompletion() ;
+        $controller = new Features\Ebay\Controller\ProjectCompletionController($request, $response, $service, $app );
+        $controller->respond('setCompletion') ;
     }
 
     public static function getCompletionRoute( $request, $response, $server, $app ) {
-        $controller = new Features\Ebay\Controller\ProjectCompletionController($request, $response, $service );
-        $controller->getCompletion() ;
+        $controller = new Features\Ebay\Controller\ProjectCompletionController($request, $response, $service, $app );
+        $controller->respond('getCompletion') ;
     }
 
     /**

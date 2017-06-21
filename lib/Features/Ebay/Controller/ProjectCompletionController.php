@@ -8,49 +8,34 @@
 
 namespace Features\Ebay\Controller;
 
+use API\V2\KleinController;
 use Features\Ebay\Model\ProjectCompletionStatusModel;
-use Klein\Request;
-use Klein\Response;
 use Projects_ProjectDao;
 use Projects_ProjectStruct;
 
-class ProjectCompletionController {
-
-    /**
-     * @var Request
-     */
-    protected $request ;
-
-    /**
-     * @var Response
-     */
-    protected $response ;
-
-    protected $service ;
+class ProjectCompletionController extends KleinController {
 
     /**
      * @var Projects_ProjectStruct
      */
     protected $project ;
 
-    public function __construct( $request, $response, $service ) {
-        $this->request = $request ;
-        $this->response = $response ;
-        $this->service = $service ;
+    protected function afterConstruct() {
+        parent::afterConstruct();
 
         $this->__findProject();
     }
 
     public function getCompletion() {
         $model = new ProjectCompletionStatusModel( $this->project ) ;
-        $this->response->json( ['status' => $model->getCurrentStaus() ] );
+        $this->response->json( [ 'status' => $model->getCurrentStaus() ] );
     }
 
     public function setCompletion() {
         $model = new ProjectCompletionStatusModel( $this->project ) ;
 
         if ( $model->isCompletable() ) {
-            $this->project->setMetadata('ebay_project_completed_at', time() );
+            $this->project->setMetadata( 'ebay_project_completed_at', time() );
             $this->response->code( 200 ) ;
         }
         else {
