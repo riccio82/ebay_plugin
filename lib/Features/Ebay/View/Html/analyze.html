@@ -6,8 +6,8 @@
     <meta name="description" content="MateCat allows you to get more matches than any other CAT tool."/>
     <meta name="viewport" content="width=device-width"/>
     <link href="${basepath}public/css/build/common.css?build=${build_number}" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" href="${basepath}public/css/analyze.css?build=${build_number}"/>
     <link rel="stylesheet" href="${basepath}public/css/popup.css?build=${build_number}"/>
+    <link rel="stylesheet" href="${basepath}public/css/analyze.css?build=${build_number}"/>
     <link rel="stylesheet" href="${basepath}public/css/libs/jquery.powertip.css?build=${build_number}"/>
 
     <script type="text/javascript">
@@ -26,67 +26,130 @@
     </script>
 
     <style type="text/css">
-        body#analyze .loadingbar {position: relative;
-    margin-top: 10px;
-    top: 0px;
-    background: #f4f4f4;
-    padding-bottom: 10px;
-    padding-left: 2%;
-    width: 98%;
-    border-bottom: 1px solid #ababac;}
-        body, .body {background:#fff; }
-        .tablestats td.languages { width: 100% }
-       /* .project-data .tablestats, .instructions { width: 50%; } */
+        body#analyze .loadingbar {
+            position: relative;
+            margin-top: 10px;
+            top: 0px;
+            background: #f4f4f4;
+            padding-bottom: 10px;
+            padding-left: 2%;
+            width: 98%;
+            border-bottom: 1px solid #ababac;
+        }
 
-       .wrapper.instructions, .wrapper.word-count-left {
-    float: left;
-    padding: 1% 4%;
-    min-width: initial;
-}
+        body, .body {
+            background: #fff;
+        }
 
-.instructions-txt p {
-    font-size: 16px;
-    line-height: 24px;
-}
+        .tablestats td.languages {
+            width: 100%
+        }
 
-.file-info th, .file-info td {
-    border-bottom: 1px solid #f4f4f4;
-}
+        .wrapper.instructions {
+            float: left;
+            padding: 1% 4%;
+            min-width: initial;
+        }
 
-.file-info th {
-    width: 20%;
-    font-size:15px;
-}
+        .instructions-txt p {
+            font-size: 16px;
+            line-height: 24px;
+        }
 
-.file-info th {
-    width: 20%;
-    font-size: 14px;
-    padding: 5px 0px;
-}
+        .file-info th, .file-info td {
+            border-bottom: 1px solid #f4f4f4;
+        }
 
-.wrapper.instructions {
-    width: 40%;
-}
+        .file-info th {
+            width: 20%;
+            font-size: 15px;
+        }
 
-.wrapper.instructions h4 {
-    font-size: 20px;
-        margin: 20px 0 10px 0;
-}
+        .file-info th {
+            width: 20%;
+            font-size: 14px;
+            padding: 5px 0px;
+        }
 
-.instructions-txt h4 {
-    font-size: 26px!important;
-}
+        .wrapper.instructions {
+            width: 90%;
+            max-width: 1110px;
+        }
 
-.wrapper.word-count-left {
-    margin-top: 3%;
-    width: calc(43% - 2px);
-    background: #f0f0f0;
-    padding: 1% 2% 1% 3%;
-    border: 1px solid #333;
-    border-radius: 4px;
-    -moz-box-shadow: 0 0px 6px #888;
-    -webkit-box-shadow: 0 0px 6px #888;
-}
+        .wrapper.instructions h4 {
+            font-size: 20px;
+            margin: 20px 0 10px 0;
+        }
+
+        .instructions-txt h4 {
+            font-size: 26px !important;
+        }
+
+        .wrapper.word-count-left {
+            background: #f0f0f0;
+            padding: 1% 2% 1% 3%;
+            border: 1px solid #333;
+            border-radius: 4px;
+            -moz-box-shadow: 0 0px 6px #888;
+            -webkit-box-shadow: 0 0px 6px #888;
+        }
+
+        a.standardbtn.completeProjectButton {
+            position: absolute;
+            top: 15%;
+            right: 0;
+        }
+
+        .completion-info {
+            position: relative;
+        }
+
+        .wrapper.word-count-left {
+            float: left;
+            position: relative;
+            margin-top: 15px;
+            display: inline-block;
+            max-width: 1024px;
+            margin-left: 4%;
+        }
+
+        td.empty.undoCompleteBtnContainer {
+            width: 165px !important;
+            display: inline-block;
+        }
+
+        span.job-undoComplete-label {
+            color: #666;
+            line-height: 30px;
+            font-size: 17px;
+            float: left;
+            margin-left: 15px;
+        }
+
+        td.empty.undoCompleteBtnContainer.completed {
+            width: 330px !important;
+            display: inline-block;
+        }
+
+        a.standardbtn.undoCompleteBtn {
+            float: left;
+        }
+        .undoCompleteBtn.disabled {
+            pointer-events: none;
+        }
+
+        span.job-completed-label {
+            color: #666;
+            font-size: 16px;
+            height: 33px;
+            line-height: 21px;
+            text-align: left;
+            float: right;
+            max-width: 150px;
+            margin-top: -5px;
+        }
+
+
 
     </style>
 
@@ -151,16 +214,6 @@
 
     <div class="wrapper instructions">
 
-
-        <div class="completion-info">
-            <h4> Completion </h4>
-            <div>
-                <p class="completableStatus"></p>
-
-                <a href="#" class="standardbtn disabled completeProjectButton" >Complete project</a>
-            </div>
-        </div>
-
         <div class="instructions-txt">
             <h4>Instructions</h4>
 
@@ -204,6 +257,16 @@
             </ul>
 
         </tal:block>
+
+        <div class="completion-info">
+            <h4> Completion </h4>
+            <div>
+                <p class="completableStatus"></p>
+
+                <a href="#" class="standardbtn disabled completeProjectButton" >Complete project</a>
+            </div>
+        </div>
+
 
     </div>
     <div class="wrapper word-count-left">
@@ -280,7 +343,8 @@
 
         <h1>Split <span class="jid" data-jid="">Job</span><span class="chunks" style="display: none;">x</span></h1>
         <div class="splitbtn-cont">
-            <h2 class="popup-split-job-title"> Title </h2>
+            <h2 class="popup-split-project-title"> Job Lang </h2>
+            <h3><span class="popup-split-job-id"></span><span class="popup-split-job-title"> Job Lang </span></h3>
             <span class="label left">Split in</span>
             <select name="popup-splitselect" class="splitselect left">
                 <option value="2">2</option>
