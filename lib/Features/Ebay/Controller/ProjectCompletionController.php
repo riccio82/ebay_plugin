@@ -28,7 +28,12 @@ class ProjectCompletionController extends KleinController {
 
     public function getCompletion() {
         $model = new ProjectCompletionStatusModel( $this->project ) ;
-        $this->response->json( [ 'status' => $model->getCurrentStaus() ] );
+        $status = $model->getCurrentStaus();
+
+        $this->response->json( [
+                'status'       => $status['status'],
+                'completed_at' => $status['completed_at']
+        ] );
     }
 
     public function setCompletion() {

@@ -78,7 +78,7 @@ $(function() {
             case STATUS_RECOMPLETABLE :
                 return 'All chunks completed, you can now complete this project' ;
             case STATUS_COMPLETED :
-                return 'This project was already completed' ;
+                return 'This project was already completed on ' + moment( completionDate ).format('LLL') ;
             case STATUS_MISSING_COMPLETED_CHUNKS :
                 return 'Not all chunks have been marked as complete yet.' ;
             default :
@@ -115,7 +115,7 @@ $(function() {
         if ( $(e.target).hasClass('disabled') ) return ;
 
         APP.confirm({
-            msg: 'Are you sure you want to make the whole project as completed? This action cannot canceled.',
+            msg: 'Are you sure you want to set the whole project as completed? This action cannot canceled.',
             callback: 'completeProjectConfirmed'
         });
     });
@@ -124,6 +124,7 @@ $(function() {
         return $.get('/plugins/ebay/api/v1/projects/' + config.id_project + '/' + config.password + '/completion_status' )
             .done( function( data ) {
                 currentStatus = data.status ;
+                completionDate = data.completed_at ;
 
                 enableProjectCompletionButtonByData(  ) ;
                 displayMessage() ;

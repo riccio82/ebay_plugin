@@ -37,31 +37,50 @@ class ProjectCompletionStatusModel {
         $this->parentModel = new ParentModel( $this->project ) ;
     }
 
+    /**
+     *
+     */
     public function getCurrentStaus() {
         if ( count( $this->getCompleteTranslateChunks() ) != count( $this->project->getChunks() ) ) {
-            return self::STATUS_MISSING_COMPLETED_CHUNKS ;
+            return [
+                    'status'       => self::STATUS_MISSING_COMPLETED_CHUNKS,
+                    'completed_at' => null
+            ] ;
         }
 
-        $project_completion_date = $this->project->getMetadataValue(Features\Ebay::PROJECT_COMPLETION_METADATA_KEY) ;
+        $project_completion_timestamp = $this->project->getMetadataValue(Features\Ebay::PROJECT_COMPLETION_METADATA_KEY) ;
 
-        if ( is_null( $project_completion_date ) ) {
-            return self::STATUS_NON_COMPLETED ;
+
+        if ( is_null( $project_completion_timestamp ) ) {
+            return [
+                    'status'       => self::STATUS_NON_COMPLETED,
+                    'completed_at' => null
+            ] ;
         }
 
-        if ( strtotime($this->mostRecentCompletedTranslation()['completed_at']) > (int) $project_completion_date) {
-            return self::STATUS_RECOMPLETABLE ;
+        $most_recent_date = date_create($this->mostRecentCompletedTranslation()['completed_at']) ;
+        $project_completion_date = date_create_from_format('U', $project_completion_timestamp ) ;
+
+        if ( $most_recent_date > $project_completion_date) {
+            return [
+                    'status'       => self::STATUS_RECOMPLETABLE,
+                    'completed_at' => $project_completion_date->format('c')
+            ];
         }
         else {
-            return self::STATUS_COMPLETED  ;
+            return [
+                    'status'       => self::STATUS_COMPLETED ,
+                    'completed_at' => $project_completion_date->format('c')
+            ] ;
         }
     }
 
     public function isCompletable() {
-        return in_array($this->getCurrentStaus(), [ self::STATUS_NON_COMPLETED, self::STATUS_RECOMPLETABLE ] );
+        return in_array($this->getCurrentStaus()['status'], [ self::STATUS_NON_COMPLETED, self::STATUS_RECOMPLETABLE ] );
     }
 
     public function isChunkCompletionUndoable() {
-        return $this->getCurrentStaus() != self::STATUS_COMPLETED ;
+        return $this->getCurrentStaus()['status'] != self::STATUS_COMPLETED ;
     }
 
     public function mostRecentCompletedTranslation() {
