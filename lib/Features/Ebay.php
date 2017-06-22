@@ -8,6 +8,7 @@
 
 namespace Features;
 
+use Exception;
 use Exceptions\ValidationError;
 
 use Features\Ebay\Utils\Metadata;
@@ -107,7 +108,7 @@ class Ebay extends BaseFeature {
 
             try {
                 new \DateTime( $projectStructure[ 'metadata' ][ 'due_date' ] );
-            } catch ( \Exception $e ) {
+            } catch ( Exception $e ) {
                 if ( !array_key_exists('errors', $projectStructure[ 'result' ])) {
                     $projectStructure[ 'result' ]['errors'] = array();
                 }
@@ -311,8 +312,17 @@ class Ebay extends BaseFeature {
     /**
      * Ebay customisation requires that identical source and target are considered identical
      */
-    public function filterIdenticalSourceAndTargetIsTranslated($originalValue) {
-        return true ;
+    public function filterIdenticalSourceAndTargetIsTranslated($originalValue, $projectStructure ) {
+
+        if ( !isset( $projectStructure['metadata']) && !isset( $projectStructure['metadata']['project_type'] )) {
+            throw new Exception( 'Expected project_type was not found' ) ;
+        }
+        if ( $projectStructure['metadata']['project_type'] == 'MT' ) {
+            return true ;
+        }
+        else {
+            return $originalValue ;
+        }
     }
 
     public function getDependencies() {
