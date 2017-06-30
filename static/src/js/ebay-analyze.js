@@ -20,22 +20,29 @@ $(function() {
 
     function clickUndo(e) {
         var jid = $(e.target).closest('tbody').data('jid'),
-            password = $(e.target).closest('tbody').data('pwd');
+            password = $(e.target).closest('tbody').data('pwd'),
+            id_event = $(e.currentTarget).closest('a').data('event_id') ;
 
         $.ajax({
             type: 'DELETE',
-            url: sprintf('/api/app/jobs/%s/%s/completion-events/%s',
-                jid, password, $(e.currentTarget).find('a').data('event_id') )
+            url: sprintf('/api/app/jobs/%s/%s/completion-events/%s', jid, password, id_event )
         }).done( function() {
+
             var cell = $(e.currentTarget).closest('td');
             $(e.currentTarget).remove();
             element = $('<span class="job-undoComplete-label">Not Completed yet</span>') ;
+            cell.empty();
             cell.append(element);
-            reloadStatusFromServer() ;
+
+            // reload status data from server
+            reloadStatusFromServer()
+                .done(function() {
+                    loadChunkCompletionData().done( enableOrDisableSplitAndMerge )
+                }) ;
         });
     }
 
-    function drawButtonsByData( data ) {
+    function drawButtonsByChunkCompletionData( data ) {
         data1 = data ;
         _.each( data.project_status.translate, function( item ) {
 
@@ -44,11 +51,10 @@ $(function() {
                 element = null ;
 
             if ( item.completed ) {
-                element = $('<div><a data-event_id="'+ item.event_id +'" href="#" class="standardbtn undoCompleteBtn">Undo Complete</a><span class="job-completed-label">' + sprintf(' Completed on %s', moment(  item.completed_at ).format('LLL') )+ '</span></div>')
-                    // .data('powertip', sprintf(' Completed on %s', moment(  item.completed_at ).format('LLL') ) )
-                    .on('click', clickUndo )
-                    // .powerTip()
+                element = $('<div><a data-event_id="'+ item.event_id +'" href="#" class="standardbtn undoCompleteBtn">Undo Complete</a><span class="job-completed-label">' + sprintf(' Completed on %s', moment(  item.completed_at ).format('LLL') )+ '</span></div>') ;
                 cell.addClass("completed");
+
+                element.find('.undoCompleteBtn').on('click', clickUndo);
             }
 
             else {
@@ -57,17 +63,6 @@ $(function() {
 
             cell.append( element ) ;
         });
-    }
-
-    function enableProjectCompletionButtonByData( ) {
-        if (currentStatus === STATUS_COMPLETED) {
-            $('.completeProjectButton').addClass('disabled');
-            $('.undoCompleteBtn').addClass('disabled');
-        } else if ( currentStatus == STATUS_NON_COMPLETED || currentStatus == STATUS_RECOMPLETABLE ) {
-            $('.completeProjectButton').removeClass('disabled');
-        } else {
-            $('.completeProjectButton').addClass('disabled');
-        }
     }
 
     function getExplanatoryText() {
@@ -90,9 +85,48 @@ $(function() {
         $('.completableStatus').text( getExplanatoryText()  );
     }
 
-    function dataLoaded( data ) {
-        drawButtonsByData( data ) ;
-        return ( new $.Deferred() ).resolve() ;
+    function chunkDataLoaded( data ) {
+        drawButtonsByChunkCompletionData( data ) ;
+        enableOrDisableSplitAndMerge( data );
+        return ( new $.Deferred() ).resolve( data ) ;
+    }
+
+    function enableOrDisableButtons() {
+        if (currentStatus === STATUS_COMPLETED) {
+            $('.completeProjectButton').addClass('disabled');
+            $('.undoCompleteBtn').addClass('disabled');
+        } else if ( currentStatus === STATUS_NON_COMPLETED || currentStatus === STATUS_RECOMPLETABLE ) {
+            $('.completeProjectButton').removeClass('disabled');
+        } else {
+            $('.completeProjectButton').addClass('disabled');
+        }
+    }
+
+    /**
+     *
+     * @param data
+     */
+    function enableOrDisableSplitAndMerge( data ) {
+        console.log( 'enableOrDisableSplitAndMerge', data ) ;
+
+        var completed_translate = _.reject( data.project_status.translate, function( item ) {
+            return item.completed_at === null ;
+        });
+
+        if ( completed_translate.length > 0 ) {
+
+            $('.domerge').hide();
+            $('.splitbtn-cont').hide();
+        }
+        else {
+            if (data.project_status.translate.length > 1 ) $('.domerge').show();
+            else $('.splitbtn-cont').show();
+        }
+    }
+
+    function statusChanged() {
+        displayMessage() ;
+        enableOrDisableButtons() ;
     }
 
     function completeProjectConfirmed() {
@@ -105,7 +139,8 @@ $(function() {
 
                 currentStatus = STATUS_COMPLETED ;
                 completionDate = new Date();
-                displayMessage() ;
+
+                statusChanged() ;
             }) ;
     }
 
@@ -124,20 +159,20 @@ $(function() {
     function reloadStatusFromServer() {
         return $.get('/plugins/ebay/api/v1/projects/' + config.id_project + '/' + config.password + '/completion_status' )
             .done( function( data ) {
+
                 currentStatus = data.status ;
                 completionDate = data.completed_at ;
 
-                enableProjectCompletionButtonByData(  ) ;
-                displayMessage() ;
+                statusChanged();
             });
     };
 
-    function loadCompletionData() {
-        return $.get('/api/v2/projects/' + config.id_project + '/' + config.password + '/completion_status' )
-            .done( dataLoaded )
-            .done( reloadStatusFromServer ) ;
+    function loadChunkCompletionData() {
+        return $.get('/api/v2/projects/' + config.id_project + '/' + config.password + '/completion_status' ) ;
     }
 
-    loadCompletionData();
+    loadChunkCompletionData()
+        .done( chunkDataLoaded )
+        .done( reloadStatusFromServer ) ;
 
 });

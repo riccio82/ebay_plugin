@@ -58,10 +58,12 @@ class ProjectCompletionStatusModel {
             ] ;
         }
 
-        $most_recent_date = date_create($this->mostRecentCompletedTranslation()['completed_at']) ;
+        // In order for the project to be recompletable, all completed dates must be later than the
+        // project completion date ;
+
         $project_completion_date = date_create_from_format('U', $project_completion_timestamp ) ;
 
-        if ( $most_recent_date > $project_completion_date) {
+        if ( $this->isRecompletable( $project_completion_date ) ) {
             return [
                     'status'       => self::STATUS_RECOMPLETABLE,
                     'completed_at' => $project_completion_date->format('c')
@@ -75,22 +77,30 @@ class ProjectCompletionStatusModel {
         }
     }
 
+    /**
+     * In order for a project to be recompletable, all chunks must be recompleted after the last
+     * project completion date .
+     *
+     * @param $project_completion_date
+     *
+     * @return bool
+     */
+    private function isRecompletable( $project_completion_date ) {
+        $chunks = $this->getCompleteTranslateChunks() ;
+        $chunks_completed_after_project_completion = array_filter( $chunks, function( $item ) use ($project_completion_date) {
+            $date = date_create( $item['completed_at']) ;
+            return $date > $project_completion_date ;
+        });
+
+        return count( $chunks ) == count( $chunks_completed_after_project_completion );
+    }
+
     public function isCompletable() {
         return in_array($this->getCurrentStaus()['status'], [ self::STATUS_NON_COMPLETED, self::STATUS_RECOMPLETABLE ] );
     }
 
     public function isChunkCompletionUndoable() {
         return $this->getCurrentStaus()['status'] != self::STATUS_COMPLETED ;
-    }
-
-    public function mostRecentCompletedTranslation() {
-        $completed = $this->getCompleteTranslateChunks() ;
-        usort( $completed , function( $item1, $item2 ) {
-            if ( $item1['completed_at'] == $item2['completed_at'] ) return 0 ;
-            return ( $item1['completed_at'] > $item2['completed_at'] ) ? 1 : -1 ;
-        });
-
-        return $completed[0];
     }
 
     public function getCompleteTranslateChunks() {
