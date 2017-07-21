@@ -272,7 +272,7 @@ class Ebay extends BaseFeature {
     }
 
     public static function getCompletionRoute( $request, $response, $server, $app ) {
-        $controller = new Features\Ebay\Controller\ProjectCompletionController($request, $response, $service, $app );
+        $controller = new Features\Ebay\Controller\ProjectCompletionController($request, $response, $server, $app );
         $controller->respond('getCompletion') ;
     }
 
