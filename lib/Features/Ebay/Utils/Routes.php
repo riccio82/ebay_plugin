@@ -8,8 +8,6 @@
  */
 namespace Features\Ebay\Utils;
 
-use \INIT ;
-
 class Routes {
 
 
