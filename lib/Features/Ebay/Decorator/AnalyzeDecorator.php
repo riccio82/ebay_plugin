@@ -11,9 +11,11 @@ namespace Features\Ebay\Decorator;
 use AbstractModelViewDecorator ;
 
 use Analysis\Status;
+use Features\Ebay;
 use INIT ;
 use DateTime ;
 use Features\Ebay\Utils\Routes ;
+use Utils;
 
 
 class AnalyzeDecorator extends AbstractModelViewDecorator {
@@ -71,8 +73,6 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
 
         $template->reference_files            = $this->model->reference_files ;
 
-        $client                 = \OauthClient::getInstance()->getClient();
-
         $template->support_mail    = INIT::$SUPPORT_MAIL;
 
         $langDomains = \Langs_LanguageDomains::getInstance();
@@ -83,7 +83,7 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $misconfiguration = Status::thereIsAMisconfiguration();
         if ( $misconfiguration && mt_rand( 1, 3 ) == 1 ) {
             $msg = "<strong>The analysis daemons seem not to be running despite server configuration.</strong><br />Change the application configuration or start analysis daemons.";
-            \Utils::sendErrMailReport( $msg, "Matecat Misconfiguration" );
+            Utils::sendErrMailReport( $msg, "Matecat Misconfiguration" );
         }
 
         $template->daemon_misconfiguration = var_export( $misconfiguration, true );
@@ -96,16 +96,18 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         // TODO: this should be moved to a specifi model
         $metadata = $this->model->getProject()->getMetadataAsKeyValue();
         $date = null;
+
         if ( $metadata['due_date'] != null ) {
             $date = new DateTime( $metadata['due_date'] );
             $date = $date->format('Y-m-d H:i:s');
         }
 
         return array(
-                'instructions' => $this->getInstructions(),
-                'file_name'    => $metadata[ 'file_name' ],
-                'due_date'     => $date,
-                'word_count'   => $metadata[ 'word_count' ],
+                'instructions'            => $this->getInstructions(),
+                'file_name'               => $metadata[ 'file_name' ],
+                'due_date'                => $date,
+                'word_count'              => $metadata[ 'word_count' ],
+                'project_completion_timestamp' => $metadata[ Ebay::PROJECT_COMPLETION_METADATA_KEY ]
         );
     }
 

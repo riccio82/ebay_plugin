@@ -13,16 +13,20 @@ use Exceptions\ValidationError;
 
 use Features\Ebay\Utils\Metadata;
 use Features\Ebay\Utils\Routes as Routes ;
+use Klein\Klein;
 use LQA\ChunkReviewStruct;
 
 use Features\Ebay\Utils\SkippedSegments;
 use Features ;
+use Projects_ProjectStruct;
 
 class Ebay extends BaseFeature {
 
     private $translation;
     private $old_translation;
     private $edit_distance;
+
+    const PROJECT_COMPLETION_METADATA_KEY = 'ebay_project_completed_at';
 
     public function postProjectCreate( $projectStructure ) {
         $projectStructure[ 'result' ][ 'analyze_url' ] = Routes::analyze( array(
@@ -90,6 +94,11 @@ class Ebay extends BaseFeature {
     public function filterStatsControllerResponse( $response, $params ) {
         $response ['stats']  = array_merge( $response ['stats'], SkippedSegments::getDataForStats( $params['chunk'] ) );
         return $response ;
+    }
+
+    public function filterIsChunkCompletionUndoable( $undoable, Projects_ProjectStruct $project, $chunk ) {
+        $model = new Features\Ebay\Model\ProjectCompletionStatusModel( $project ) ;
+        return $model->isChunkCompletionUndoable() ;
     }
 
     private function __setTranslation() {
@@ -170,11 +179,11 @@ class Ebay extends BaseFeature {
      * This function updates the eq_word_count setting it to null right before the project is
      * closed by the TM Analysis. This way we force the project to always use raw word count.
      *
-     * @param \Projects_ProjectStruct $project
+     * @param Projects_ProjectStruct $project
      * 
      * TODO: this code needs to be refactored
      */
-    public function beforeTMAnalysisCloseProject(\Projects_ProjectStruct $project) {
+    public function beforeTMAnalysisCloseProject( Projects_ProjectStruct $project) {
         $db = \Database::obtain()->getConnection() ;
 
         $sql_project_id = 'SELECT id FROM jobs WHERE id_project = ?';
@@ -238,18 +247,33 @@ class Ebay extends BaseFeature {
         return $status;
     }
 
-    public static function loadRoutes( \Klein\Klein $klein ) {
-        $klein->respond( 'GET', '/analyze/[:name]/[:id_project]-[:password]', function ( $request, $response, $service ) {
-            $controller    = new Ebay\Controller\AnalyzeController( $request, $response, $service );
-            $template_path = dirname( __FILE__ ) . '/Ebay/View/Html/analyze.html';
-            $controller->setView( $template_path );
-            $controller->respond();
-        } );
+    public static function loadRoutes( Klein $klein ) {
+        $klein->respond( 'GET', '/analyze/[:name]/[:id_project]-[:password]',              [__CLASS__, 'analyzeRoute'] );
+        $klein->respond( 'GET', '/reference-files/[:id_project]/[:password]/[:zip_index]', [__CLASS__, 'referenceFilesRoute' ] );
+        $klein->respond( 'POST', '/projects/[:id_project]/[:password]/completion',         [__CLASS__, 'setProjectCompletedRoute' ] ) ;
+        $klein->respond( 'GET', '/api/v1/projects/[:id_project]/[:password]/completion_status',         [__CLASS__, 'getCompletionRoute' ] ) ;
+    }
 
-        $klein->respond( 'GET', '/reference-files/[:id_project]/[:password]/[:zip_index]', function ( $request, $response, $service ) {
-            $controller    = new Ebay\Controller\ReferenceFilesController( $request, $response, $service );
-            $controller->downloadFile();
-        } );
+    public static function analyzeRoute($request, $response, $service, $app) {
+        $controller    = new Ebay\Controller\AnalyzeController( $request, $response, $service );
+        $template_path = dirname( __FILE__ ) . '/Ebay/View/Html/analyze.html';
+        $controller->setView( $template_path );
+        $controller->respond();
+    }
+
+    public static function referenceFilesRoute($request, $response, $service, $app) {
+        $controller    = new Ebay\Controller\ReferenceFilesController( $request, $response, $service );
+        $controller->downloadFile();
+    }
+
+    public static function setProjectCompletedRoute( $request, $response, $service, $app ) {
+        $controller = new Features\Ebay\Controller\ProjectCompletionController($request, $response, $service, $app );
+        $controller->respond('setCompletion') ;
+    }
+
+    public static function getCompletionRoute( $request, $response, $server, $app ) {
+        $controller = new Features\Ebay\Controller\ProjectCompletionController($request, $response, $server, $app );
+        $controller->respond('getCompletion') ;
     }
 
     /**
