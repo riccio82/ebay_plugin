@@ -9,9 +9,11 @@
 namespace Features\Ebay\Utils;
 
 
+use Exception;
 use Jobs\MetadataDao;
 use Chunks_ChunkStruct ;
 use Jobs\MetadataStruct;
+use Utils;
 
 
 class SkippedSegments
@@ -28,7 +30,7 @@ class SkippedSegments
         return $struct ? (int) $struct->value : 0 ;
     }
 
-    public static function updateSkippedSegmentsCount( \Chunks_ChunkStruct $chunk,
+    public static function updateSkippedSegmentsCount( Chunks_ChunkStruct $chunk,
                                                        $old_translation,
                                                        $new_translation,
                                                        $propagated_ids ) {
@@ -113,7 +115,7 @@ class SkippedSegments
         self::setSkippedIds( $chunk, $add_list ) ;
     }
 
-    private static function incrementCount( \Chunks_ChunkStruct $chunk, $id_segment, $propagated_ids ) {
+    private static function incrementCount( Chunks_ChunkStruct $chunk, $id_segment, $propagated_ids ) {
         if ( empty( $propagated_ids ) ) {
             $add_list = array( $id_segment ) ;
         } else {
@@ -126,7 +128,7 @@ class SkippedSegments
         self::setSkippedIds( $chunk, $new_list ) ;
     }
 
-    private static function decrementCount( \Chunks_ChunkStruct $chunk, $id_segment, $propagated_ids ) {
+    private static function decrementCount( Chunks_ChunkStruct $chunk, $id_segment, $propagated_ids ) {
         if ( empty( $propagated_ids ) ) {
             $remove_list = array( $id_segment ) ;
         } else {
@@ -156,11 +158,18 @@ class SkippedSegments
     }
 
     private static function setSkippedIds( Chunks_ChunkStruct $chunk, $list ) {
+        $value = json_encode( array_values ( array_unique( $list ) ) ) ;
+
+        if ( is_null( $value ) ) {
+            try {
+                Utils::raiseJsonExceptionError();
+            } catch ( Exception $e ) {
+            }
+            $value = json_encode( [] ) ;
+        }
+
         $dao = new MetadataDao();
         $dao->set( $chunk->id, $chunk->password, self::METADATA_COUNT_KEY, count( $list ) ) ;
-        $dao->set( $chunk->id, $chunk->password, self::METADATA_LIST_KEY, json_encode(
-            array_values ( array_unique( $list ) )
-        ) ) ;
+        $dao->set( $chunk->id, $chunk->password, self::METADATA_LIST_KEY, $value ) ;
     }
-
 }
