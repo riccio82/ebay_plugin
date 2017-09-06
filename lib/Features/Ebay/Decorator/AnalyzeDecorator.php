@@ -8,20 +8,28 @@
 
 namespace Features\Ebay\Decorator;
 
-use AbstractModelViewDecorator ;
-
+use AbstractModelViewDecorator;
 use Analysis\Status;
+use Analysis_AnalysisModel;
+use DateTime;
+use Exception;
+use Features\Dqf;
 use Features\Ebay;
-use INIT ;
-use DateTime ;
-use Features\Ebay\Utils\Routes ;
+use Features\Ebay\Utils\Routes;
+use Files_FileDao;
+use FilesStorage;
+use INIT;
+use Langs_LanguageDomains;
+use PHPTALWithAppend;
+use Users_UserStruct;
 use Utils;
+use ZipArchiveExtended;
 
 
 class AnalyzeDecorator extends AbstractModelViewDecorator {
 
     /**
-     * @var \Analysis_AnalysisModel
+     * @var Analysis_AnalysisModel
      */
     protected $model ;
 
@@ -30,19 +38,21 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
      */
     protected $project ;
 
+    /**
+     * @var Users_UserStruct
+     */
     private $user ;
 
-    public function __construct( \Analysis_AnalysisModel $model ) {
+    public function __construct( Analysis_AnalysisModel $model ) {
         $this->model = $model ;
-
         $this->project = $this->model->getProject();
     }
 
-    public function decorate( $template ) {
+    public function decorate( PHPTALWithAppend $template ) {
 
-        $template->basepath     = INIT::$BASEURL;
-        $template->build_number = INIT::$BUILD_NUMBER;
-        $template->enable_outsource = false;
+        $template->basepath                   = INIT::$BASEURL;
+        $template->build_number               = INIT::$BUILD_NUMBER;
+        $template->enable_outsource           = false;
 
         $template->pid                        = $this->model->getProject()->id;
         $template->project_password           = $this->model->getProject()->password;
@@ -72,10 +82,9 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $template->subject                    = $this->model->subject;
 
         $template->reference_files            = $this->model->reference_files ;
+        $template->support_mail               = INIT::$SUPPORT_MAIL;
 
-        $template->support_mail    = INIT::$SUPPORT_MAIL;
-
-        $langDomains = \Langs_LanguageDomains::getInstance();
+        $langDomains = Langs_LanguageDomains::getInstance();
         $this->subject = $langDomains::getDisplayDomain(null);
 
         $template->isLoggedIn = $this->user != null ;
@@ -89,7 +98,21 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $template->daemon_misconfiguration = var_export( $misconfiguration, true );
         $template->project_data = $this->getProjectData() ;
 
+
+        if ( $this->project->hasFeature( Dqf::FEATURE_CODE ) ) {
+            $this->__decorateForDqf( $template );
+        }
         $template->append('footer_js', Routes::staticSrc('js/ebay-analyze.js') );
+    }
+
+    private function __decorateForDqf( $template ) {
+        $template->dqf_intermediate_project = $this->project->getMetadataValue(Dqf::INTERMEDIATE_PROJECT_METADATA_KEY);
+        $template->user = $this->user ;
+
+        if ( $this->user ) {
+            $template->dqf_user = new Dqf\Model\UserModel( $this->user ) ;
+        }
+
     }
 
     private function getProjectData() {
@@ -112,10 +135,10 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
     }
 
     private function getInstructions() {
-        $files = \Files_FileDao::getByProjectId( $this->project->id );
-        $fs = new \FilesStorage();
+        $files = Files_FileDao::getByProjectId( $this->project->id );
+        $fs = new FilesStorage();
 
-        list($zip_filename) = explode(\ZipArchiveExtended::INTERNAL_SEPARATOR, $files[0]->filename);
+        list($zip_filename) = explode( ZipArchiveExtended::INTERNAL_SEPARATOR, $files[0]->filename);
 
         $zip_path = $fs->getOriginalZipPath(
                 $this->project->create_date,
@@ -133,7 +156,7 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         return $content ;
     }
 
-    public function setUser( \Users_UserStruct $user=null ) {
+    public function setUser( Users_UserStruct $user=null ) {
         $this->user = $user ;
     }
 

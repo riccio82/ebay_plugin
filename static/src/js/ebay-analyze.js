@@ -7,7 +7,12 @@ $.extend( UI, {
 
 function precomputeOutsourceQuotes() {} ;
 
+
 $(function() {
+
+    /**
+     * Code for chunk and project completion
+     */
 
     var STATUS_COMPLETED = 'completed' ;
     var STATUS_NON_COMPLETED = 'non_completed';
@@ -176,3 +181,21 @@ $(function() {
         .done( reloadStatusFromServer ) ;
 
 });
+
+
+function createDqfProject() {
+    if ( $('#createIntermediateProjectButton').hasClass('disabled') ) {
+        return ;
+    }
+
+    $('#createIntermediateProjectButton').addClass('disabled');
+
+    return $.post('/plugins/ebay/api/app/projects/' + config.id_project + '/' + config.password + '/dqf_intermediate_project' )
+        .done( function(data) {
+            window.location.href = window.location.href ;
+            console.log( data ) ;
+        })
+        .error( function(data) {
+            console.error( data ) ;
+        });
+}

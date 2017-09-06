@@ -247,10 +247,11 @@ class Ebay extends BaseFeature {
     }
 
     public static function loadRoutes( Klein $klein ) {
-        $klein->respond( 'GET', '/analyze/[:name]/[:id_project]-[:password]',              [__CLASS__, 'analyzeRoute'] );
-        $klein->respond( 'GET', '/reference-files/[:id_project]/[:password]/[:zip_index]', [__CLASS__, 'referenceFilesRoute' ] );
-        $klein->respond( 'POST', '/projects/[:id_project]/[:password]/completion',         [__CLASS__, 'setProjectCompletedRoute' ] ) ;
-        $klein->respond( 'GET', '/api/v1/projects/[:id_project]/[:password]/completion_status',         [__CLASS__, 'getCompletionRoute' ] ) ;
+        $klein->respond( 'GET',  '/analyze/[:name]/[:id_project]-[:password]',              [__CLASS__, 'analyzeRoute'] );
+        $klein->respond( 'GET',  '/reference-files/[:id_project]/[:password]/[:zip_index]', [__CLASS__, 'referenceFilesRoute' ] );
+        $klein->respond( 'POST', '/projects/[:id_project]/[:password]/completion',          [__CLASS__, 'setProjectCompletedRoute' ] ) ;
+        $klein->respond( 'GET',  '/api/v1/projects/[:id_project]/[:password]/completion_status',        [__CLASS__, 'getCompletionRoute' ] ) ;
+        $klein->respond( 'POST', '/api/app/projects/[:id_project]/[:password]/dqf_intermediate_project', [__CLASS__, 'createIntermediateProject' ] ) ;
     }
 
     public static function analyzeRoute($request, $response, $service, $app) {
@@ -273,6 +274,11 @@ class Ebay extends BaseFeature {
     public static function getCompletionRoute( $request, $response, $server, $app ) {
         $controller = new Features\Ebay\Controller\ProjectCompletionController($request, $response, $server, $app );
         $controller->respond('getCompletion') ;
+    }
+
+    public static function createIntermediateProject($request, $response, $server, $app) {
+        $controller = new Features\Ebay\Controller\DqfIntermediateProjectController($request, $response, $server, $app);
+        $controller->respond('create') ;
     }
 
     /**
@@ -324,7 +330,6 @@ class Ebay extends BaseFeature {
 
     public function postJobMerged( $projectStructure ) {
         $id_job = $projectStructure[ 'job_to_merge' ];
-
         $chunk = \Chunks_ChunkDao::getByJobID( $id_job ) [ 0 ] ;
         SkippedSegments::postJobMerged( $chunk ) ;
 
@@ -348,6 +353,10 @@ class Ebay extends BaseFeature {
         else {
             return $originalValue ;
         }
+    }
+
+    public function filterDqfIntermediateProjectRequired($value) {
+        return true ;
     }
 
     public function getDependencies() {
