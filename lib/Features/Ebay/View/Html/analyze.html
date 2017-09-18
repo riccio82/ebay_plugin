@@ -290,7 +290,8 @@
 
         </div>
 
-        <tal:block tal:condition="dqf_intermediate_project">
+
+        <tal:block tal:condition="project_completable">
             <div class="completion-info">
                 <h4> Completion </h4>
                 <div>
@@ -303,7 +304,7 @@
 
     </div>
 
-    <div tal:condition="dqf_intermediate_project" class="wrapper word-count-left">
+    <div tal:condition="splittable" class="wrapper word-count-left">
         <tal:block tal:define="id_for_job php:array()" tal:repeat="id_for_job jobs">
 
             <div tal:attributes="data-jid string:${repeat/id_for_job/key}; class string:jobcontainer ${id_for_job/splitted}">

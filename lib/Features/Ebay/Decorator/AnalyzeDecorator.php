@@ -98,6 +98,8 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $template->daemon_misconfiguration = var_export( $misconfiguration, true );
         $template->project_data = $this->getProjectData() ;
 
+        $template->splittable  = true;
+        $template->project_completable = true ;
 
         if ( $this->project->hasFeature( Dqf::FEATURE_CODE ) ) {
             $this->__decorateForDqf( $template );
@@ -106,7 +108,14 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
     }
 
     private function __decorateForDqf( $template ) {
-        $template->dqf_intermediate_project = $this->project->getMetadataValue(Dqf::INTERMEDIATE_PROJECT_METADATA_KEY);
+        $intermediate_project_id = $this->project->getMetadataValue(Dqf::INTERMEDIATE_PROJECT_METADATA_KEY);
+
+        if ( !$intermediate_project_id ) {
+            $template->splittable = false ;
+            $template->project_completable = false;
+        }
+
+        $template->dqf_intermediate_project = $intermediate_project_id ;
         $template->user = $this->user ;
 
         if ( $this->user ) {
