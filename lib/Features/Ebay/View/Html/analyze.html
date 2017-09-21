@@ -268,13 +268,24 @@
                             <a href="javascript:void(0);" class="bluebtn" id="createIntermediateProjectButton" onclick="createDqfProject();">Create DQF project</a>
                         </p>
                         <p>
-                            This will create a DQF project with owned by DQF user <i><span tal:content="dqf_user/getDqfUsername"></span></i>.
+                            This will create a DQF project owned by DQF user <strong><span tal:content="dqf_user/getDqfUsernameOrMateCatEmail"></span></strong>.
                         </p>
                     </tal:block>
 
                     <tal:block tal:condition="not: dqf_user/hasCredentials">
-                        To create a DQF project you must fill in valid DQF credentials.
+                        <p>
+                            You don't have valid DQF credentials on your profile. MateCat will create DQF projects associated to your
+                            current email <span tal:content="dqf_user/getDqfUsernameOrMateCatEmail"></span>.
+                        </p>
+                        <p>
+                            You will be able to view this project's data in DQF if you sign in using the same email address.
+                        </p>
+                        <p>
+                            <a href="javascript:void(0);" class="bluebtn" id="createIntermediateProjectButton" onclick="createDqfProject();">Create DQF project</a>
+                        </p>
+                        <!--
                         <a href="javascript:void(0);" class="bluebtn" onclick="$('#modal').trigger('openpreferences');">Add DQF credentials</a>
+                        -->
                     </tal:block>
                 </tal:block>
 
