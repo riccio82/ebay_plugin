@@ -18,6 +18,7 @@ class CatDecorator extends \AbstractDecorator {
 
     /**
      * @var \catController
+     * @var \PHPTALWithAppend
      */
     protected $controller;
 
@@ -26,17 +27,16 @@ class CatDecorator extends \AbstractDecorator {
     protected $metadata ;
 
     /**
-     * @var \PHPTALWithAppend
      */
     protected $template ;
 
     public function decorate() {
 
-        $project = $this->controller->getJob()->getProject() ;
+        $project = $this->controller->getChunk()->getProject() ;
 
         $this->template->append('footer_js', Routes::staticBuild('ebay.js') );
 
-        $this->metadata = $this->controller->getJob()->getProject()->getMetadataAsKeyValue();
+        $this->metadata = $this->controller->getChunk()->getProject()->getMetadataAsKeyValue();
         $this->statuses = new SegmentStatuses( $project ) ;
 
         $this->template->searchable_statuses = $this->statuses->getSearchableStatuses();
