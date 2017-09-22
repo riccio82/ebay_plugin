@@ -34,7 +34,7 @@ class CatDecorator extends \AbstractDecorator {
 
         $project = $this->controller->getJob()->getProject() ;
 
-        $this->template->append('footer_js', Routes::staticBuild('ebay.js') );
+        $this->template->append('footer_js', Routes::staticSrc('js/ebay-core.js') );
 
         $this->metadata = $this->controller->getJob()->getProject()->getMetadataAsKeyValue();
         $this->statuses = new SegmentStatuses( $project ) ;
