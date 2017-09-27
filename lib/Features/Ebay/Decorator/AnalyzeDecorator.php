@@ -11,6 +11,7 @@ namespace Features\Ebay\Decorator;
 use AbstractModelViewDecorator ;
 
 use Analysis\Status;
+use Bootstrap;
 use Features\Ebay;
 use INIT ;
 use DateTime ;
@@ -90,6 +91,8 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $template->project_data = $this->getProjectData() ;
 
         $template->append('footer_js', Routes::staticSrc('js/ebay-analyze.js') );
+
+        $template->googleDriveEnabled = Bootstrap::isGDriveConfigured() ;
     }
 
     private function getProjectData() {
