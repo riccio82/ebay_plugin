@@ -11,6 +11,7 @@ namespace Features\Ebay\Decorator;
 use AbstractModelViewDecorator;
 use Analysis\Status;
 use Analysis_AnalysisModel;
+use Bootstrap;
 use DateTime;
 use Exception;
 use Features\Dqf;
@@ -100,6 +101,8 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
 
         $template->splittable  = true;
         $template->project_completable = true ;
+
+        $template->googleDriveEnabled = Bootstrap::isGDriveConfigured() ;
 
         if ( $this->project->hasFeature( Dqf::FEATURE_CODE ) ) {
             $this->__decorateForDqf( $template );
