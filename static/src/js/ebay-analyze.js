@@ -19,7 +19,7 @@ $(function() {
     var STATUS_RECOMPLETABLE = 'recompletable' ;
     var STATUS_MISSING_COMPLETED_CHUNKS = 'missing_completed_chunks' ;
 
-    currentStatus = null ;
+    var currentStatus = null ;
 
     $( '.mergebtn, .splitbtn' ).removeClass( 'disabled' );
 
