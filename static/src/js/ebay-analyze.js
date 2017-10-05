@@ -188,6 +188,8 @@ function createDqfProject() {
         return ;
     }
 
+    $('.dqf-info .loader').show();
+
     $('#createIntermediateProjectButton').addClass('disabled');
 
     return $.post('/plugins/ebay/api/app/projects/' + config.id_project + '/' + config.password + '/dqf_intermediate_project' )

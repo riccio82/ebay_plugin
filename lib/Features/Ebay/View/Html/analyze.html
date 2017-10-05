@@ -266,6 +266,7 @@
                     <tal:block tal:condition="dqf_user/hasCredentials">
                         <p>
                             <a href="javascript:void(0);" class="bluebtn" id="createIntermediateProjectButton" onclick="createDqfProject();">Create DQF project</a>
+                            <div class="loader loader_on"/>
                         </p>
                         <p>
                             This will create a DQF project owned by DQF user <strong><span tal:content="dqf_user/getDqfUsernameOrMateCatEmail"></span></strong>.
@@ -282,6 +283,7 @@
                         </p>
                         <p>
                             <a href="javascript:void(0);" class="bluebtn" id="createIntermediateProjectButton" onclick="createDqfProject();">Create DQF project</a>
+                            <div class="loader loader_on"></div>
                         </p>
                         <!--
                         <a href="javascript:void(0);" class="bluebtn" onclick="$('#modal').trigger('openpreferences');">Add DQF credentials</a>
