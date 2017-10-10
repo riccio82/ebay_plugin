@@ -5,6 +5,8 @@
             <th></th>
             <th tal:condition="enable_outsource">Payable</th>
             <th>Total</th>
+            <th>Revision</th>
+            <th>Translate</th>
         </tr>
         </thead>
         <tbody>
@@ -26,7 +28,13 @@
                 <td tal:condition="enable_outsource" class="stat-payable">
                     <strong class="stat_tot" tal:content="job/total_eq_word_count_print">11,500</strong></td>
                 <td class="stat-total" tal:content="job/total_raw_word_count_print">13,500</td>
-
+                <td class="stat-email-revision">
+                    <div class="stat-email">federico@translated.net</div>
+                    <div class="ui cancel label"><i class="icon-cancel-circle"></i></div>
+                </td>
+                <td class="stat-email-translate">
+                    <div class="stat-email">federico@translated.net</div>
+                    <div class="ui cancel label"><i class="icon-cancel-circle"></i></div></td>
                 <td class="empty">
                     <a tal:attributes="href string:${basepath}translate/${pname}/${job/source_short}-${job/target_short}/${job/jid}-${job/jpassword}" href="#" target="_blank" class="uploadbtn translate">Translate</a>
                 </td>
