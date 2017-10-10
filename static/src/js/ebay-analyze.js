@@ -7,9 +7,29 @@ $.extend( UI, {
 
 function precomputeOutsourceQuotes() {} ;
 
+var removeAssignmentData   ;
+
+function dqfDeleteAssignment() {
+    $.ajax({
+        type: 'DELETE',
+        url: sprintf('/api/app/dqf/jobs/%s/%s/%s/assignment/revoke',
+            removeAssignmentData.jid, removeAssignmentData.pwd, removeAssignmentData.what )
+    }).done( function() {
+        var node = findDqfCell(removeAssignmentData.jid, removeAssignmentData.pwd, removeAssignmentData.what );
+        node.find('.stat-email').text();
+        node.find('.ui.cancel').hide();
+    });
+}
+
+function findDqfCell(jid, pwd, page) {
+    return $(sprintf('tbody.tablestats[data-jid=%s][data-pwd=%s] .stat-email-%s', jid, pwd, page ));
+}
+
+$.extend( UI, {
+    dqfDeleteAssignment : dqfDeleteAssignment
+});
 
 $(function() {
-
     /**
      * Code for chunk and project completion
      */
@@ -52,7 +72,7 @@ $(function() {
         _.each( data.project_status.translate, function( item ) {
 
             var selector = sprintf( 'tbody[data-jid=%s][data-pwd=%s]', item.id, item.password ),
-                cell = $( selector ).find( 'tr:first td:last' ) ,
+                cell = $( selector ).find( 'tr:first td.undoCompleteBtnContainer' ) ,
                 element = null ;
 
             if ( item.completed ) {
@@ -63,7 +83,7 @@ $(function() {
             }
 
             else {
-                element = $('<span class="job-undoComplete-label">Not Completed yet</span>') ;
+                element = $('<span class="job-undoComplete-label">Not completed yet</span>') ;
             }
 
             cell.append( element ) ;
@@ -138,28 +158,13 @@ $(function() {
         var path = sprintf('/plugins/ebay/projects/%s/%s/completion', config.id_project, config.password ) ;
 
         $.post( path, {} )
-            .done( function(data) {
-                $('.undoCompleteBtn').addClass('disabled');
-                $('.completeProjectButton').addClass('disabled');
-
-                currentStatus = STATUS_COMPLETED ;
-                completionDate = new Date();
-
-                statusChanged() ;
-            }) ;
-    }
-
-    UI.completeProjectConfirmed = completeProjectConfirmed ;
-
-    $(document).on('click', '.completeProjectButton', function(e) {
-        e.preventDefault();
         if ( $(e.target).hasClass('disabled') ) return ;
 
         APP.confirm({
             msg: 'Are you sure you want to set the whole project as completed? This action cannot canceled.',
             callback: 'completeProjectConfirmed'
         });
-    });
+    };
 
     function reloadStatusFromServer() {
         return $.get('/plugins/ebay/api/v1/projects/' + config.id_project + '/' + config.password + '/completion_status' )
@@ -180,8 +185,50 @@ $(function() {
         .done( chunkDataLoaded )
         .done( reloadStatusFromServer ) ;
 
-});
 
+    $.get( sprintf('/api/app/dqf/projects/%s/%s/assignments', config.id_project, config.password ), {})
+        .done( function( data ) {
+            $.each( data, function( index, element ) {
+
+
+                if ( element.translate_user ) {
+                    var node = findDqfCell( element.id, element.password, 'translate' ) ;
+
+                    $(node).find(' .stat-email ').text( element.translate_user.email );
+                    $(node).find('.ui.cancel.label').show();
+                }
+
+                if ( element.review_user ) {
+                    var node = findDqfCell( element.id, element.password, 'translate' ) ;
+
+                    $(node).find('.stat-email ').text( element.review_user.email );
+                    $(node).find('.ui.cancel.label').show();
+                }
+
+                console.log( element ) ;
+            });
+
+        });
+
+    function confirmRemoveAssignment(event) {
+        var jid  = $(event.target).closest('tbody').data('jid');
+        var pwd  = $(event.target).closest('tbody').data('pwd');
+        var what = $(event.target).closest('td').hasClass('stat-email-translate') ? 'translate' : 'revise' ;
+        var email = $(event.target).closest('td').text ().trim() ;
+
+        removeAssignmentData = { jid  : jid, pwd : pwd, what : what };
+
+        APP.confirm({
+            cancelTxt : 'Cancel',
+            okTxt : 'Yes, remove assignment',
+            callback : 'dqfDeleteAssignment',
+            msg : 'Are you sure you want to remove DQF assignment to ' + email + ' for ' + what + ' on chunk ' + jid + ' and password ' + pwd + '?'
+        });
+    }
+
+    $('.stat-email-translate .cancel, .stat-email-revision .cancel').on('click', confirmRemoveAssignment) ;
+
+});
 
 function createDqfProject() {
     if ( $('#createIntermediateProjectButton').hasClass('disabled') ) {

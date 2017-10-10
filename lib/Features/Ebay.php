@@ -9,6 +9,7 @@
 namespace Features;
 
 use Chunks_ChunkStruct;
+use Constants_TranslationStatus;
 use Exception;
 use Features;
 use Features\Ebay\Utils\Metadata;
@@ -228,6 +229,10 @@ class Ebay extends BaseFeature {
         return $new_files   ;
     }
 
+    // public function filterSetSuggestionReportStatuses( $statuses ) {
+    //     return array_merge( $statuses, [ Constants_TranslationStatus::STATUS_DRAFT ] ) ;
+    // }
+
     /**
      * When project_type is 'MT', pretranslated segments are to be saved as DRAFT
      * for Ebay.
@@ -238,9 +243,8 @@ class Ebay extends BaseFeature {
      * @return string
      */
     public function filter_status_for_pretranslated_segments( $status, $projectStructure ) {
-        // TODO: constantize MT
         if ( $projectStructure[ 'metadata' ][ 'project_type' ] == 'MT' ) {
-            $status = \Constants_TranslationStatus::STATUS_DRAFT;
+            $status = Constants_TranslationStatus::STATUS_DRAFT;
         }
 
         return $status;

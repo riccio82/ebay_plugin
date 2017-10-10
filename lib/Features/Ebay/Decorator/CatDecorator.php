@@ -47,6 +47,8 @@ class CatDecorator extends \AbstractDecorator {
         $projectCompletionModel = new ProjectCompletionStatusModel( $project ) ;
         $this->template->chunk_completion_undoable = $projectCompletionModel->isChunkCompletionUndoable() ;
 
+        $this->template->translation_matches_enabled = false ;
+
     }
 
 }
