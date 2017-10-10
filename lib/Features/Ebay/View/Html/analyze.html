@@ -109,7 +109,7 @@
             position: relative;
             margin-top: 15px;
             display: inline-block;
-            max-width: 1024px;
+            max-width: 1050px;
             margin-left: 4%;
         }
 
@@ -121,18 +121,19 @@
         span.job-undoComplete-label {
             color: #666;
             line-height: 30px;
-            font-size: 17px;
+            font-size: 14px;
             float: left;
             margin-left: 15px;
         }
 
         td.empty.undoCompleteBtnContainer.completed {
-            width: 330px !important;
+            width: 313px !important;
             display: inline-block;
         }
 
         a.standardbtn.undoCompleteBtn {
             float: left;
+            margin-left: 0px !important;
         }
         .undoCompleteBtn.disabled {
             pointer-events: none;
@@ -140,7 +141,7 @@
 
         span.job-completed-label {
             color: #666;
-            font-size: 16px;
+            font-size: 14px;
             height: 33px;
             line-height: 21px;
             text-align: left;
@@ -149,6 +150,40 @@
             margin-top: -5px;
         }
 
+        .stat-email-revision,
+        .stat-email-translate  {
+            min-width: 180px;
+            text-align: left !important;
+            position: relative;
+        }
+
+        .stat-email-revision .stat-email,
+        .stat-email-translate .stat-email {
+            font-size: 15px;
+            text-align: left;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ui.cancel.label {
+            padding: 4px;
+            margin-top: 3px;
+            border-radius: 15px;
+            line-height: 0px;
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            top: 4px;
+            font-size: 17px;
+            right: 8px;
+            color: #989898;
+            cursor: pointer;
+        }
+
+        .ui.cancel.label:hover {
+            color: #6d6d6d;
+        }
 
 
     </style>
