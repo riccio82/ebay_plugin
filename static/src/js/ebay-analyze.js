@@ -158,13 +158,28 @@ $(function() {
         var path = sprintf('/plugins/ebay/projects/%s/%s/completion', config.id_project, config.password ) ;
 
         $.post( path, {} )
+            .done( function(dat) {
+                $('.undoCompleteBtn').addClass('disabled');
+                $('.completeProjectButton').addClass('disabled');
+
+                currentStatus = STATUS_COMPLETED ;
+                completionDate = new Date();
+
+                statusChanged() ;
+            }) ;
+    }
+
+    UI.completeProjectConfirmed = completeProjectConfirmed ;
+
+    $(document).on('click', '.completeProjectButton', function(e) {
+        e.preventDefault();
         if ( $(e.target).hasClass('disabled') ) return ;
 
         APP.confirm({
             msg: 'Are you sure you want to set the whole project as completed? This action cannot canceled.',
             callback: 'completeProjectConfirmed'
         });
-    };
+    });
 
     function reloadStatusFromServer() {
         return $.get('/plugins/ebay/api/v1/projects/' + config.id_project + '/' + config.password + '/completion_status' )
