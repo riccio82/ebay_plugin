@@ -200,29 +200,29 @@ $(function() {
         .done( chunkDataLoaded )
         .done( reloadStatusFromServer ) ;
 
+    function activateUserCell(node, email) {
+        $(node).find('.stat-email ').text( email );
+        $(node).find('.ui.cancel.label').show();
+    }
 
     $.get( sprintf('/api/app/dqf/projects/%s/%s/assignments', config.id_project, config.password ), {})
         .done( function( data ) {
             $.each( data, function( index, element ) {
-
+                var email, node ;
 
                 if ( element.translate_user ) {
-                    var node = findDqfCell( element.id, element.password, 'translate' ) ;
+                    email = element.translate_user.email ;
+                    node = findDqfCell( element.id, element.password, 'translate' ) ;
+                    activateUserCell(node, email);
 
-                    $(node).find(' .stat-email ').text( element.translate_user.email );
-                    $(node).find('.ui.cancel.label').show();
                 }
 
                 if ( element.review_user ) {
-                    var node = findDqfCell( element.id, element.password, 'translate' ) ;
-
-                    $(node).find('.stat-email ').text( element.review_user.email );
-                    $(node).find('.ui.cancel.label').show();
+                    email = element.review_user.email ;
+                    node = findDqfCell( element.id, element.password, 'revise' ) ;
+                    activateUserCell(node, email) ;
                 }
-
-                console.log( element ) ;
             });
-
         });
 
     function confirmRemoveAssignment(event) {
@@ -241,7 +241,7 @@ $(function() {
         });
     }
 
-    $('.stat-email-translate .cancel, .stat-email-revision .cancel').on('click', confirmRemoveAssignment) ;
+    $('.stat-email-translate .cancel, .stat-email-revise .cancel').on('click', confirmRemoveAssignment) ;
 
 });
 
