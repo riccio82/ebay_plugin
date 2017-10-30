@@ -229,6 +229,12 @@ class Ebay extends BaseFeature {
         return $new_files   ;
     }
 
+    /**
+     * There is a potential problem enabling this callback because the DRAFT status suggestions
+     * may be overwritten by subsequent calls to the MT/TM engine because getContributionController does
+     * a get/set. Adding DRAFT there would to it forever unless the status changes to TRANSLATE. So we would
+     * end having suggestion data which is not the initial one.
+     */
     // public function filterSetSuggestionReportStatuses( $statuses ) {
     //     return array_merge( $statuses, [ Constants_TranslationStatus::STATUS_DRAFT ] ) ;
     // }
