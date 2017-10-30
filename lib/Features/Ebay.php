@@ -50,6 +50,10 @@ class Ebay extends BaseFeature {
         if ( $controller == 'analyzeController' ) {
             $project = $params['project'];
 
+            if ( $params['page_type'] == 'job_analysis' ) {
+                throw new Exception('Not found', 404) ;
+            }
+
             $route = Routes::analyze( array(
                     'project_name' => $project->name,
                     'id_project'   => $project->id,
