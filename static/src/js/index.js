@@ -89,14 +89,6 @@ if ( config.isReview )
  */
 (function initEbayCommon ( $, UI, undefined ) {
 
-    // Disable getContribution and Translation Matches
-    $.extend( UI, {
-        getContribution : function() {
-            var deferred = new $.Deferred() ;
-            return deferred.resolve();
-        }
-    } );
-
     $(document).on('setProgress:rendered', function( e, data ) {
 
         if (
