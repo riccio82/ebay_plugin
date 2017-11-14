@@ -8,8 +8,8 @@
 
 namespace Features;
 
+use controller;
 use Exception;
-use Exceptions\ValidationError;
 
 use Features\Ebay\Utils\Metadata;
 use Features\Ebay\Utils\Routes as Routes ;
@@ -41,13 +41,17 @@ class Ebay extends BaseFeature {
      * to the custom analyze page.
      *
      * Every project that was created by a user who has this feature enabled
-     * should fall into this case. 
+     * should fall into this case.
      *
-     * @param $controller
-     * @param $params
+     * @param controller $controller
+     * @param            $params
+     *
+     * @throws Exception
      */
-    public function beginDoAction($controller, $params) {
-        if ( $controller == 'analyzeController' ) {
+    public function beginDoAction( controller $controller, $params) {
+
+        $controllerName = get_class( $controller );
+        if ( $controllerName == 'analyzeController' ) {
             $project = $params['project'];
 
             if ( $params['page_type'] == 'job_analysis' ) {
