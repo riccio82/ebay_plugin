@@ -41,6 +41,8 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
 
     public function decorate( $template ) {
 
+        $this->setTempalteVarsBefore( $template );
+
         $template->basepath     = INIT::$BASEURL;
         $template->build_number = INIT::$BUILD_NUMBER;
         $template->enable_outsource = false;
@@ -92,7 +94,7 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
 
         $template->append('footer_js', Routes::staticSrc('js/ebay-analyze.js') );
 
-        $template->googleDriveEnabled = Bootstrap::isGDriveConfigured() ;
+        $this->setTemplateVarsAfter( $template );
     }
 
     private function getProjectData() {
