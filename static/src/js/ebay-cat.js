@@ -1,7 +1,13 @@
-/**
- *  REVISE
- *
- */
+if ( ReviewImproved.enabled() ) {
+    (function($, root, undefined) {
+        $.extend(UI, {
+            autoCopySuggestionEnabled: function () {
+                return false;
+            }
+        });
+    })(jQuery, window);
+}
+
 if ( config.isReview )
 (function ( $, UI, undefined ) {
 
