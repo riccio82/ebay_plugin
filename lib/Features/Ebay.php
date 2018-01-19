@@ -189,24 +189,31 @@ class Ebay extends BaseFeature {
      * This function updates the eq_word_count setting it to null right before the project is
      * closed by the TM Analysis. This way we force the project to always use raw word count.
      *
-     * @param Projects_ProjectStruct $project
+     * @param Projects_ProjectStruct|int $project
      * 
-     * TODO: this code needs to be refactored
+     * TODO: this code needs to be refactored, does not works for multiple language jobs
      */
-    public function beforeTMAnalysisCloseProject( Projects_ProjectStruct $project) {
+    public function beforeTMAnalysisCloseProject( $project ) {
         $db = \Database::obtain()->getConnection() ;
 
         $sql_project_id = 'SELECT id FROM jobs WHERE id_project = ?';
         $stmt = $db->prepare( $sql_project_id );
 
         $stmt->setFetchMode( \PDO::FETCH_ASSOC );
-        $stmt->execute( array( $project->id ) ) ;
-        $result = $stmt->fetch();
 
-        $sql = "UPDATE segment_translations SET eq_word_count = null " .
-                " WHERE id_job = ? ";
+        if( $project instanceof Projects_ProjectStruct ){
+            $pid = $project->id;
+        } else {
+            $pid = $project;
+        }
+
+        $stmt->execute( [ $pid ] ) ;
+        $result = $stmt->fetch(); //TODO this takes only one job, manage multi language
+
+        $sql = "UPDATE segment_translations SET eq_word_count = null WHERE id_job = ? ";
         $stmt = $db->prepare( $sql );
-        $stmt->execute( array( $result['id'] ) ) ;
+        $stmt->execute( [ $result['id'] ] ) ;
+
     }
 
     /**
