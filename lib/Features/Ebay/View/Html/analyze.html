@@ -287,7 +287,17 @@
         <div tal:condition="dqf_enabled" class="dqf-info">
             <h4> DQF Status </h4>
 
-            <div tal:condition="not: dqf_intermediate_project">
+            <div tal:condition="not: project_data/dqf_master_project_creation_completed_at" style="color:white; background-color: gold; padding:10px" >
+                <div class="tm-warning">
+                    <p>
+                        There was an error during project creation to DQF. Please try to reload this page.
+                        If the problem persists try to create the project again or contact <a href="mailto:support@matecat.com" style="color:white">support@matecat.com</a>.
+                    </p>
+                </div>
+            </div>
+
+            <div tal:condition="project_data/dqf_master_project_creation_completed_at">
+                <div tal:condition="not: dqf_intermediate_project">
                 <p>
                     A DQF project linked to your account was not created yet. You must create a DQF project before this project can be accessed.
                 </p>
@@ -326,7 +336,10 @@
                     To Create a DQF project you must be signed in.
                     <a href="javascript:void(0);" class="bluebtn" onclick="$('#modal').trigger('openlogin');">Sign in</a>
                 </span>
+                </div>
             </div>
+
+
 
             <div tal:condition="dqf_intermediate_project">
                 <p>Dqf project was successfully created.</p>

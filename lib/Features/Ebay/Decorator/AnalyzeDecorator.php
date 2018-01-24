@@ -99,7 +99,7 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $template->daemon_misconfiguration = var_export( $misconfiguration, true );
         $template->project_data = $this->getProjectData() ;
 
-        $template->splittable  = true;
+        $template->splittable = true;
         $template->project_completable = true ;
 
         $template->googleDriveEnabled = Bootstrap::isGDriveConfigured() ;
@@ -138,11 +138,14 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         }
 
         return array(
-                'instructions'            => $this->getInstructions(),
-                'file_name'               => $metadata[ 'file_name' ],
-                'due_date'                => $date,
-                'word_count'              => $metadata[ 'word_count' ],
-                'project_completion_timestamp' => $metadata[ Ebay::PROJECT_COMPLETION_METADATA_KEY ]
+                'instructions'                  => $this->getInstructions(),
+                'file_name'                     => $metadata[ 'file_name' ],
+                'due_date'                      => $date,
+                'word_count'                    => $metadata[ 'word_count' ],
+                'project_completion_timestamp'  => $metadata[ Ebay::PROJECT_COMPLETION_METADATA_KEY ],
+                'dqf_review_settings_id'        => $metadata[ 'dqf_review_settings_id' ],
+                'dqf_source_segments_submitted' => $metadata[ 'dqf_source_segments_submitted' ],
+                'dqf_master_project_creation_completed_at' => $metadata[ 'dqf_master_project_creation_completed_at' ]
         );
     }
 
