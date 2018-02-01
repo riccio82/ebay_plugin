@@ -49,7 +49,7 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $this->project = $this->model->getProject();
     }
 
-    public function decorate( PHPTALWithAppend $template ) {
+    public function decorate( $template ) {
 
         $template->basepath                   = INIT::$BASEURL;
         $template->build_number               = INIT::$BUILD_NUMBER;
