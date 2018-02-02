@@ -37,7 +37,7 @@ $(function() {
             // reload status data from server
             reloadStatusFromServer()
                 .done(function() {
-                    loadChunkCompletionData().done( enableOrDisableSplitAndMerge )
+                    loadChunkCompletionData()
                 }) ;
         });
     }
@@ -87,7 +87,6 @@ $(function() {
 
     function chunkDataLoaded( data ) {
         drawButtonsByChunkCompletionData( data ) ;
-        enableOrDisableSplitAndMerge( data );
         return ( new $.Deferred() ).resolve( data ) ;
     }
 
@@ -99,28 +98,6 @@ $(function() {
             $('.completeProjectButton').removeClass('disabled');
         } else {
             $('.completeProjectButton').addClass('disabled');
-        }
-    }
-
-    /**
-     *
-     * @param data
-     */
-    function enableOrDisableSplitAndMerge( data ) {
-        console.log( 'enableOrDisableSplitAndMerge', data ) ;
-
-        var completed_translate = _.reject( data.project_status.translate, function( item ) {
-            return item.completed_at === null ;
-        });
-
-        if ( completed_translate.length > 0 ) {
-
-            $('.domerge').hide();
-            $('.splitbtn-cont').hide();
-        }
-        else {
-            if (data.project_status.translate.length > 1 ) $('.domerge').show();
-            else $('.splitbtn-cont').show();
         }
     }
 
