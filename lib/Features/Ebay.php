@@ -28,6 +28,9 @@ class Ebay extends BaseFeature {
 
     const PROJECT_COMPLETION_METADATA_KEY = 'ebay_project_completed_at';
 
+    const PROJECT_TYPE_MT = 'MT' ;
+    const PROJECT_TYPE_HT = 'HT' ;
+
     public function postProjectCreate( $projectStructure ) {
         $projectStructure[ 'result' ][ 'analyze_url' ] = Routes::analyze( array(
                 'project_name' => $projectStructure[ 'project_name' ],
@@ -249,7 +252,7 @@ class Ebay extends BaseFeature {
      * @return string
      */
     public function filter_status_for_pretranslated_segments( $status, $projectStructure ) {
-        if ( $projectStructure[ 'metadata' ][ 'project_type' ] == 'MT' ) {
+        if ( $projectStructure[ 'metadata' ][ 'project_type' ] == self::PROJECT_TYPE_MT  ) {
             $status = Constants_TranslationStatus::STATUS_DRAFT;
         }
 
@@ -357,7 +360,7 @@ class Ebay extends BaseFeature {
         if ( !isset( $projectStructure['metadata']) && !isset( $projectStructure['metadata']['project_type'] )) {
             throw new Exception( 'Expected project_type was not found' ) ;
         }
-        if ( $projectStructure['metadata']['project_type'] == 'MT' ) {
+        if ( $projectStructure['metadata']['project_type'] == self::PROJECT_TYPE_MT ) {
             return true ;
         }
         else {
