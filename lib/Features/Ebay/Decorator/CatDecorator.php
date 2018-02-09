@@ -18,7 +18,6 @@ class CatDecorator extends \AbstractDecorator {
 
     /**
      * @var \catController
-     * @var \PHPTALWithAppend
      */
     protected $controller;
 
@@ -27,6 +26,7 @@ class CatDecorator extends \AbstractDecorator {
     protected $metadata ;
 
     /**
+     * @var \PHPTALWithAppend
      */
     protected $template ;
 
@@ -34,7 +34,7 @@ class CatDecorator extends \AbstractDecorator {
 
         $project = $this->controller->getChunk()->getProject() ;
 
-        $this->template->append('footer_js', Routes::staticBuild('ebay.js') );
+        $this->template->append('footer_js', Routes::staticSrc('js/ebay-cat.js') );
 
         $this->metadata = $this->controller->getChunk()->getProject()->getMetadataAsKeyValue();
         $this->statuses = new SegmentStatuses( $project ) ;
@@ -47,6 +47,7 @@ class CatDecorator extends \AbstractDecorator {
         $projectCompletionModel = new ProjectCompletionStatusModel( $project ) ;
         $this->template->chunk_completion_undoable = $projectCompletionModel->isChunkCompletionUndoable() ;
 
+        $this->template->allow_link_to_analysis = false ;
         $this->template->translation_matches_enabled = false ;
 
     }

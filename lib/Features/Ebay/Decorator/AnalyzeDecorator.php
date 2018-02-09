@@ -51,9 +51,11 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
 
     public function decorate( $template ) {
 
-        $template->basepath                   = INIT::$BASEURL;
-        $template->build_number               = INIT::$BUILD_NUMBER;
-        $template->enable_outsource           = false;
+        $this->setTempalteVarsBefore( $template );
+
+        $template->basepath     = INIT::$BASEURL;
+        $template->build_number = INIT::$BUILD_NUMBER;
+        $template->enable_outsource = false;
 
         $template->pid                        = $this->model->getProject()->id;
         $template->project_password           = $this->model->getProject()->password;
@@ -83,7 +85,8 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $template->subject                    = $this->model->subject;
 
         $template->reference_files            = $this->model->reference_files ;
-        $template->support_mail               = INIT::$SUPPORT_MAIL;
+
+        $template->support_mail    = INIT::$SUPPORT_MAIL;
 
         $langDomains = Langs_LanguageDomains::getInstance();
         $this->subject = $langDomains::getDisplayDomain(null);
@@ -108,6 +111,8 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
             $this->__decorateForDqf( $template );
         }
         $template->append('footer_js', Routes::staticSrc('js/ebay-analyze.js') );
+
+        $this->setTemplateVarsAfter( $template );
     }
 
     private function __decorateForDqf( $template ) {
