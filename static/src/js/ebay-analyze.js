@@ -16,7 +16,7 @@ function dqfDeleteAssignment() {
             removeAssignmentData.jid, removeAssignmentData.pwd, removeAssignmentData.what )
     }).done( function() {
         var node = findDqfCell(removeAssignmentData.jid, removeAssignmentData.pwd, removeAssignmentData.what );
-        node.find('.stat-email').text();
+        node.text('');
         node.find('.ui.cancel').hide();
     });
 }
