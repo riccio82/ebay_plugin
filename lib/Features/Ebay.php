@@ -8,11 +8,12 @@
 
 namespace Features;
 
-use controller;
 use Chunks_ChunkStruct;
+use controller;
 use Constants_TranslationStatus;
 use Exception;
 use Features;
+use Features\Dqf\Model\ExtendedTranslationStruct;
 use Features\Ebay\Utils\Metadata;
 use Features\Ebay\Utils\Routes as Routes;
 use Features\Ebay\Utils\SkippedSegments;
@@ -380,7 +381,19 @@ class Ebay extends BaseFeature {
         return true ;
     }
 
-    public function getDependencies() {
+    /**
+     * Ebay projects are either MT or HT by default so we override MateCat's computation and provide an hardcoded value.
+     *
+     * @param                           $name
+     * @param ExtendedTranslationStruct $translationStruct
+     * @param Chunks_ChunkStruct        $chunk
+     *
+     * @return mixed|string
+     */
+    public function filterDqfSegmentOriginName( $name, ExtendedTranslationStruct $translationStruct, Chunks_ChunkStruct $chunk ) {
+        $projectType = $chunk->getProject()->getMetadataValue('project_type') ;
+        $originName = is_null( $projectType ) ? 'MT' : $projectType ;
+        return $originName ;
     }
 
 }
