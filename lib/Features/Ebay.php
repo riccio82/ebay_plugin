@@ -390,10 +390,18 @@ class Ebay extends BaseFeature {
      *
      * @return mixed|string
      */
-    public function filterDqfSegmentOriginName( $name, ExtendedTranslationStruct $translationStruct, Chunks_ChunkStruct $chunk ) {
+    public function filterDqfSegmentOriginAndMatchRate( $data, ExtendedTranslationStruct $translationStruct, Chunks_ChunkStruct $chunk ) {
         $projectType = $chunk->getProject()->getMetadataValue('project_type') ;
-        $originName = is_null( $projectType ) ? 'MT' : $projectType ;
-        return $originName ;
+        if ( $projectType == 'MT' ) {
+            $data[ 'originName' ] = 'MT' ;
+            $data[ 'matchRate' ] = 100 ;
+        }
+        else  {
+            $data[ 'originName' ] = 'HT' ;
+            $data[ 'matchRate' ] = null ;
+        }
+
+        return $data ;
     }
 
 }
