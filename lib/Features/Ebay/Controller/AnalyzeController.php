@@ -47,10 +47,10 @@ class AnalyzeController extends BaseKleinViewController {
     }
 
     public function respond() {
-        $decorator = new AnalyzeDecorator( $this->model );
+        $this->user = $this->currentUser() ;
 
-        $decorator->setUser( $this->currentUser() ) ;
-        $this->setLoggedUser() ;
+        $decorator = new AnalyzeDecorator( $this->model );
+        $decorator->setUser( $this->user ) ;
 
         $this->setDefaultTemplateData() ;
 

@@ -177,7 +177,12 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
     }
 
     public function setUser( Users_UserStruct $user=null ) {
-        $this->user = $user ;
+        if ( is_null( $user ) ) {
+            $this->user = new Users_UserStruct() ;
+        }
+        else {
+            $this->user = $user ;
+        }
     }
 
 
