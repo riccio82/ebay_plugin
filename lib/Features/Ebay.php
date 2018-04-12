@@ -30,6 +30,12 @@ class Ebay extends BaseFeature {
     private $old_translation;
     private $edit_distance;
 
+    public static $dependencies = [
+            Features::PROJECT_COMPLETION,
+            Features::TRANSLATION_VERSIONS,
+            Features::REVIEW_IMPROVED
+    ] ;
+
     const PROJECT_COMPLETION_METADATA_KEY = 'ebay_project_completed_at';
 
     const PROJECT_TYPE_MT = 'MT' ;
@@ -55,7 +61,7 @@ class Ebay extends BaseFeature {
      *
      * @throws Exception
      */
-    public function beginDoAction( controller $controller, $params) {
+    public function beginDoAction( controller $controller, $params = [] ) {
 
         $controllerName = get_class( $controller );
         if ( $controllerName == 'analyzeController' ) {
