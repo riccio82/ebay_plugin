@@ -32,11 +32,11 @@ class CatDecorator extends \AbstractDecorator {
 
     public function decorate() {
 
-        $project = $this->controller->getJob()->getProject() ;
+        $project = $this->controller->getChunk()->getProject() ;
 
         $this->template->append('footer_js', Routes::staticSrc('js/ebay-cat.js') );
 
-        $this->metadata = $this->controller->getJob()->getProject()->getMetadataAsKeyValue();
+        $this->metadata = $this->controller->getChunk()->getProject()->getMetadataAsKeyValue();
         $this->statuses = new SegmentStatuses( $project ) ;
 
         $this->template->searchable_statuses = $this->statuses->getSearchableStatuses();
@@ -48,6 +48,8 @@ class CatDecorator extends \AbstractDecorator {
         $this->template->chunk_completion_undoable = $projectCompletionModel->isChunkCompletionUndoable() ;
 
         $this->template->allow_link_to_analysis = false ;
+        $this->template->translation_matches_enabled = false ;
+
     }
 
 }

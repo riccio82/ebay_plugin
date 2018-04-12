@@ -8,16 +8,18 @@
 
 namespace Features;
 
+use Chunks_ChunkStruct;
 use controller;
+use Constants_TranslationStatus;
 use Exception;
-
+use Features;
+use Features\Dqf\Model\ExtendedTranslationStruct;
 use Features\Ebay\Utils\Metadata;
-use Features\Ebay\Utils\Routes as Routes ;
-use Klein\Klein;
-use LQA\ChunkReviewStruct;
-
+use Features\Ebay\Utils\Routes as Routes;
 use Features\Ebay\Utils\SkippedSegments;
-use Features ;
+use Features\ProjectCompletion\CompletionEventStruct;
+use Features\ReviewImproved\Model\QualityReportModel;
+use Klein\Klein;
 use Projects_ProjectStruct;
 
 class Ebay extends BaseFeature {
@@ -28,7 +30,16 @@ class Ebay extends BaseFeature {
     private $old_translation;
     private $edit_distance;
 
+    public static $dependencies = [
+            Features::PROJECT_COMPLETION,
+            Features::TRANSLATION_VERSIONS,
+            Features::REVIEW_IMPROVED
+    ] ;
+
     const PROJECT_COMPLETION_METADATA_KEY = 'ebay_project_completed_at';
+
+    const PROJECT_TYPE_MT = 'MT' ;
+    const PROJECT_TYPE_HT = 'HT' ;
 
     public function postProjectCreate( $projectStructure ) {
         $projectStructure[ 'result' ][ 'analyze_url' ] = Routes::analyze( array(
@@ -50,7 +61,7 @@ class Ebay extends BaseFeature {
      *
      * @throws Exception
      */
-    public function beginDoAction( controller $controller, $params) {
+    public function beginDoAction( controller $controller, $params = [] ) {
 
         $controllerName = get_class( $controller );
         if ( $controllerName == 'analyzeController' ) {
@@ -256,19 +267,19 @@ class Ebay extends BaseFeature {
      * @return string
      */
     public function filter_status_for_pretranslated_segments( $status, $projectStructure ) {
-        // TODO: constantize MT
-        if ( $projectStructure[ 'metadata' ][ 'project_type' ] == 'MT' ) {
-            $status = \Constants_TranslationStatus::STATUS_DRAFT;
+        if ( $projectStructure[ 'metadata' ][ 'project_type' ] == self::PROJECT_TYPE_MT  ) {
+            $status = Constants_TranslationStatus::STATUS_DRAFT;
         }
 
         return $status;
     }
 
     public static function loadRoutes( Klein $klein ) {
-        $klein->respond( 'GET', '/analyze/[:name]/[:id_project]-[:password]',              [__CLASS__, 'analyzeRoute'] );
-        $klein->respond( 'GET', '/reference-files/[:id_project]/[:password]/[:zip_index]', [__CLASS__, 'referenceFilesRoute' ] );
-        $klein->respond( 'POST', '/projects/[:id_project]/[:password]/completion',         [__CLASS__, 'setProjectCompletedRoute' ] ) ;
-        $klein->respond( 'GET', '/api/v1/projects/[:id_project]/[:password]/completion_status',         [__CLASS__, 'getCompletionRoute' ] ) ;
+        $klein->respond( 'GET',  '/analyze/[:name]/[:id_project]-[:password]',              [__CLASS__, 'analyzeRoute'] );
+        $klein->respond( 'GET',  '/reference-files/[:id_project]/[:password]/[:zip_index]', [__CLASS__, 'referenceFilesRoute' ] );
+        $klein->respond( 'POST', '/projects/[:id_project]/[:password]/completion',          [__CLASS__, 'setProjectCompletedRoute' ] ) ;
+        $klein->respond( 'GET',  '/api/v1/projects/[:id_project]/[:password]/completion_status',        [__CLASS__, 'getCompletionRoute' ] ) ;
+        $klein->respond( 'POST', '/api/app/projects/[:id_project]/[:password]/dqf_intermediate_project', [__CLASS__, 'createIntermediateProject' ] ) ;
     }
 
     public static function analyzeRoute($request, $response, $service, $app) {
@@ -293,6 +304,11 @@ class Ebay extends BaseFeature {
         $controller->respond('getCompletion') ;
     }
 
+    public static function createIntermediateProject($request, $response, $server, $app) {
+        $controller = new Features\Ebay\Controller\DqfIntermediateProjectController($request, $response, $server, $app);
+        $controller->respond('create') ;
+    }
+
     /**
      * Append the filter config to the post params which are coming from the UI.
      *
@@ -315,21 +331,23 @@ class Ebay extends BaseFeature {
     public function createProjectAssignInputMetadata( $metadata, $options ) {
         $options = \Utils::ensure_keys( $options, array('input'));
 
-        $metadata = array_intersect_key( $options['input'], array_flip( Metadata::$keys ) ) ;
-        $metadata = array_filter( $metadata ); // <-- remove all `empty` array elements
+        $my_metadata = array_intersect_key( $options['input'], array_flip( Metadata::$keys ) ) ;
+        $my_metadata = array_filter( $my_metadata ); // <-- remove all `empty` array elements
 
-        return  $metadata ;
+        return  array_merge( $my_metadata, $metadata );
     }
 
     /**
-     * @param $event ChunkReviewStruct
+     * @param Chunks_ChunkStruct    $chunk
+     * @param CompletionEventStruct $params
+     * @param                       $lastId
      */
-    public function project_completion_event_saved( $chunk, $params, $lastId ) {
+    public function project_completion_event_saved( Chunks_ChunkStruct $chunk, CompletionEventStruct $params, $lastId ) {
         $project = $chunk->getProject() ;
 
         if ( in_array( Features::REVIEW_IMPROVED, $project->getFeatures()->getCodes() ) ) {
             // reload quality report and dump it to file
-            $quality_report = new Features\ReviewImproved\Model\QualityReportModel( $chunk ) ;
+            $quality_report = new QualityReportModel( $chunk ) ;
             $structure = $quality_report->getStructure();
 
             $this->getLogger()->info( "ChunkCompletionEvent LASTID: $lastId" );
@@ -340,7 +358,6 @@ class Ebay extends BaseFeature {
 
     public function postJobMerged( $projectStructure ) {
         $id_job = $projectStructure[ 'job_to_merge' ];
-
         $chunk = \Chunks_ChunkDao::getByJobID( $id_job ) [ 0 ] ;
         SkippedSegments::postJobMerged( $chunk ) ;
 
@@ -358,12 +375,39 @@ class Ebay extends BaseFeature {
         if ( !isset( $projectStructure['metadata']) && !isset( $projectStructure['metadata']['project_type'] )) {
             throw new Exception( 'Expected project_type was not found' ) ;
         }
-        if ( $projectStructure['metadata']['project_type'] == 'MT' ) {
+        if ( $projectStructure['metadata']['project_type'] == self::PROJECT_TYPE_MT ) {
             return true ;
         }
         else {
             return $originalValue ;
         }
+    }
+
+    public function filterDqfIntermediateProjectRequired($value) {
+        return true ;
+    }
+
+    /**
+     * Ebay projects are either MT or HT by default so we override MateCat's computation and provide an hardcoded value.
+     *
+     * @param                           $name
+     * @param ExtendedTranslationStruct $translationStruct
+     * @param Chunks_ChunkStruct        $chunk
+     *
+     * @return mixed|string
+     */
+    public function filterDqfSegmentOriginAndMatchRate( $data, ExtendedTranslationStruct $translationStruct, Chunks_ChunkStruct $chunk ) {
+        $projectType = $chunk->getProject()->getMetadataValue('project_type') ;
+        if ( $projectType == 'MT' ) {
+            $data[ 'originName' ] = 'MT' ;
+            $data[ 'matchRate' ] = 100 ;
+        }
+        else  {
+            $data[ 'originName' ] = 'HT' ;
+            $data[ 'matchRate' ] = null ;
+        }
+
+        return $data ;
     }
 
 }

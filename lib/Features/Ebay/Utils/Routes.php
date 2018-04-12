@@ -8,8 +8,6 @@
  */
 namespace Features\Ebay\Utils;
 
-use \INIT ;
-
 class Routes {
 
 
@@ -24,7 +22,7 @@ class Routes {
     }
 
     /**
-     * @param       $params URL parameters to pass to the controller
+     * @param       $params array URL parameters to pass to the controller
      * @param array $options
      *
      * @return string

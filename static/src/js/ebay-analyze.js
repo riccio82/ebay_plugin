@@ -7,14 +7,39 @@ $.extend( UI, {
 
 function precomputeOutsourceQuotes() {} ;
 
+var removeAssignmentData   ;
+
+function dqfDeleteAssignment() {
+    $.ajax({
+        type: 'DELETE',
+        url: sprintf('/api/app/dqf/jobs/%s/%s/%s/assignment/revoke',
+            removeAssignmentData.jid, removeAssignmentData.pwd, removeAssignmentData.what )
+    }).done( function() {
+        var node = findDqfCell(removeAssignmentData.jid, removeAssignmentData.pwd, removeAssignmentData.what );
+        node.text('');
+        node.find('.ui.cancel').hide();
+    });
+}
+
+function findDqfCell(jid, pwd, page) {
+    return $(sprintf('tbody.tablestats[data-jid=%s][data-pwd=%s] .stat-email-%s', jid, pwd, page ));
+}
+
+$.extend( UI, {
+    dqfDeleteAssignment : dqfDeleteAssignment
+});
+
 $(function() {
+    /**
+     * Code for chunk and project completion
+     */
 
     var STATUS_COMPLETED = 'completed' ;
     var STATUS_NON_COMPLETED = 'non_completed';
     var STATUS_RECOMPLETABLE = 'recompletable' ;
     var STATUS_MISSING_COMPLETED_CHUNKS = 'missing_completed_chunks' ;
 
-    currentStatus = null ;
+    var currentStatus = null ;
 
     $( '.mergebtn, .splitbtn' ).removeClass( 'disabled' );
 
@@ -47,7 +72,7 @@ $(function() {
         _.each( data.project_status.translate, function( item ) {
 
             var selector = sprintf( 'tbody[data-jid=%s][data-pwd=%s]', item.id, item.password ),
-                cell = $( selector ).find( 'tr:first td:last' ) ,
+                cell = $( selector ).find( 'tr:first td.undoCompleteBtnContainer' ) ,
                 element = null ;
 
             if ( item.completed ) {
@@ -58,7 +83,7 @@ $(function() {
             }
 
             else {
-                element = $('<span class="job-undoComplete-label">Not Completed yet</span>') ;
+                element = $('<span class="job-undoComplete-label">Not completed yet</span>') ;
             }
 
             cell.append( element ) ;
@@ -110,7 +135,7 @@ $(function() {
         var path = sprintf('/plugins/ebay/projects/%s/%s/completion', config.id_project, config.password ) ;
 
         $.post( path, {} )
-            .done( function(data) {
+            .done( function(dat) {
                 $('.undoCompleteBtn').addClass('disabled');
                 $('.completeProjectButton').addClass('disabled');
 
@@ -152,4 +177,66 @@ $(function() {
         .done( chunkDataLoaded )
         .done( reloadStatusFromServer ) ;
 
+    function activateUserCell(node, email) {
+        $(node).find('.stat-email ').text( email );
+        $(node).find('.ui.cancel.label').show();
+    }
+
+    $.get( sprintf('/api/app/dqf/projects/%s/%s/assignments', config.id_project, config.password ), {})
+        .done( function( data ) {
+            $.each( data, function( index, element ) {
+                var email, node ;
+
+                if ( element.translate_user ) {
+                    email = element.translate_user.email ;
+                    node = findDqfCell( element.id, element.password, 'translate' ) ;
+                    activateUserCell(node, email);
+
+                }
+
+                if ( element.review_user ) {
+                    email = element.review_user.email ;
+                    node = findDqfCell( element.id, element.password, 'revise' ) ;
+                    activateUserCell(node, email) ;
+                }
+            });
+        });
+
+    function confirmRemoveAssignment(event) {
+        var jid  = $(event.target).closest('tbody').data('jid');
+        var pwd  = $(event.target).closest('tbody').data('pwd');
+        var what = $(event.target).closest('td').hasClass('stat-email-translate') ? 'translate' : 'revise' ;
+        var email = $(event.target).closest('td').text ().trim() ;
+
+        removeAssignmentData = { jid  : jid, pwd : pwd, what : what };
+
+        APP.confirm({
+            cancelTxt : 'Cancel',
+            okTxt : 'Yes, remove assignment',
+            callback : 'dqfDeleteAssignment',
+            msg : 'Are you sure you want to remove DQF assignment to ' + email + ' for ' + what + ' on chunk ' + jid + ' and password ' + pwd + '?'
+        });
+    }
+
+    $('.stat-email-translate .cancel, .stat-email-revise .cancel').on('click', confirmRemoveAssignment) ;
+
 });
+
+function createDqfProject() {
+    if ( $('#createIntermediateProjectButton').hasClass('disabled') ) {
+        return ;
+    }
+
+    $('.dqf-info .loader').show();
+
+    $('#createIntermediateProjectButton').addClass('disabled');
+
+    return $.post('/plugins/ebay/api/app/projects/' + config.id_project + '/' + config.password + '/dqf_intermediate_project' )
+        .done( function(data) {
+            window.location.href = window.location.href ;
+            console.log( data ) ;
+        })
+        .error( function(data) {
+            console.error( data ) ;
+        });
+}
