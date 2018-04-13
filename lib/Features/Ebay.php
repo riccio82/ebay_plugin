@@ -78,6 +78,7 @@ class Ebay extends BaseFeature {
             ) );
 
             header('Location: ' . $route);
+            die();
         }
     }
 
