@@ -5,9 +5,9 @@
     <title>Volume Analysis - MateCat</title>
     <meta name="description" content="MateCat allows you to get more matches than any other CAT tool."/>
     <meta name="viewport" content="width=device-width"/>
-    <link href="${basepath}public/css/build/common.css?build=${build_number}" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" href="${basepath}public/css/popup.css?build=${build_number}"/>
 
+    <link rel="stylesheet" href="${basepath}public/css/build/common.css?build=${build_number}" type="text/css"/>
+    <link rel="stylesheet" href="${basepath}public/css/popup.css?build=${build_number}"/>
     <link rel="stylesheet" href="${basepath}public/css/analyze_old.css?build=${build_number}"/>
     <link rel="stylesheet" href="${basepath}public/css/libs/jquery.powertip.css?build=${build_number}"/>
 
@@ -96,12 +96,6 @@
             -webkit-box-shadow: 0 0px 6px #888;
         }
 
-        a.standardbtn.completeProjectButton {
-            position: absolute;
-            top: 15%;
-            right: 0;
-        }
-
         .completion-info {
             position: relative;
         }
@@ -111,7 +105,7 @@
             position: relative;
             margin-top: 15px;
             display: inline-block;
-            max-width: 1024px;
+            max-width: 1080px;
             margin-left: 4%;
         }
 
@@ -123,18 +117,19 @@
         span.job-undoComplete-label {
             color: #666;
             line-height: 30px;
-            font-size: 17px;
+            font-size: 14px;
             float: left;
             margin-left: 15px;
         }
 
         td.empty.undoCompleteBtnContainer.completed {
-            width: 330px !important;
+            width: 313px !important;
             display: inline-block;
         }
 
         a.standardbtn.undoCompleteBtn {
             float: left;
+            margin-left: 0px !important;
         }
         .undoCompleteBtn.disabled {
             pointer-events: none;
@@ -142,7 +137,7 @@
 
         span.job-completed-label {
             color: #666;
-            font-size: 16px;
+            font-size: 14px;
             height: 33px;
             line-height: 21px;
             text-align: left;
@@ -151,19 +146,47 @@
             margin-top: -5px;
         }
 
+        .stat-email-revise,
+        .stat-email-translate  {
+            min-width: 180px;
+            text-align: left !important;
+            position: relative;
+        }
+
+        .stat-email-revise .stat-email,
+        .stat-email-translate .stat-email {
+            font-size: 15px;
+            text-align: left;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ui.cancel.label {
+            padding: 4px;
+            margin-top: 3px;
+            border-radius: 15px;
+            line-height: 0px;
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            top: 4px;
+            font-size: 17px;
+            right: 8px;
+            color: #989898;
+            cursor: pointer;
+        }
+
+        .ui.cancel.label:hover {
+            color: #6d6d6d;
+        }
 
 
     </style>
 
-    <script type="text/javascript" src="${basepath}public/js/lib/jquery.js"></script>
-    <script type="text/javascript" src="${basepath}public/js/lib/jquery-ui.js"></script>
-    <script type="text/javascript" src="${basepath}public/js/lib/jquery-dateFormat.min.js"></script>
+    <script type="text/javascript" src="${basepath}public/js/build/libs.js?build=${build_number}"></script>
+
     <script type="text/javascript" src="${basepath}public/js/forcedelivery.js"></script>
-
-    <script type="text/javascript" src="${basepath}public/js/lib/moment.min.js"></script>
-    <script type="text/javascript" src="${basepath}public/js/lib/jquery.powertip.min.js"></script>
-
-    <script type="text/javascript" src="${basepath}public/js/lib/jquery.cookie.js"></script>
     <script type="text/javascript" src="${basepath}public/js/build/common.js?build=${build_number}"></script>
     <script type="text/javascript" src="${basepath}public/js/analyze_old.js?build=${build_number}"></script>
     <!--<script type="text/javascript" src="${basepath}public/js/outsource.js?build=${build_number}"></script>-->
@@ -255,18 +278,84 @@
 
         </tal:block>
 
-        <div class="completion-info">
-            <h4> Completion </h4>
-            <div>
-                <p class="completableStatus"></p>
+        <div tal:condition="dqf_enabled" class="dqf-info">
+            <h4> DQF Status </h4>
 
-                <a href="#" class="standardbtn disabled completeProjectButton" >Complete project</a>
+            <div tal:condition="not: project_data/dqf_master_project_creation_completed_at" style="color:white; background-color: brown; padding:10px" >
+                <div class="tm-warning">
+                    <p>
+                        There was an error during project creation to DQF. Please try to reload this page.
+                        If the problem persists try to create the project again or contact <a href="mailto:support@matecat.com" style="color:white">support@matecat.com</a>.
+                    </p>
+                </div>
             </div>
+
+            <div tal:condition="project_data/dqf_master_project_creation_completed_at">
+                <div tal:condition="not: dqf_intermediate_project">
+                <p>
+                    A DQF project linked to your account was not created yet. You must create a DQF project before this project can be accessed.
+                </p>
+
+                <tal:block tal:condition="exists: dqf_user">
+
+                    <tal:block tal:condition="dqf_user/hasCredentials">
+                        <p>
+                            <a href="javascript:void(0);" class="bluebtn" id="createIntermediateProjectButton" onclick="createDqfProject();">Create DQF project</a>
+                            <div class="loader loader_on"/>
+                        </p>
+                        <p>
+                            This will create a DQF project owned by DQF user <strong><span tal:content="dqf_user/getDqfUsernameOrMateCatEmail"></span></strong>.
+                        </p>
+                    </tal:block>
+
+                    <tal:block tal:condition="not: dqf_user/hasCredentials">
+                        <p>
+                            You don't have valid DQF credentials on your profile. MateCat will create DQF projects associated to your
+                            current email <span tal:content="dqf_user/getDqfUsernameOrMateCatEmail"></span>.
+                        </p>
+                        <p>
+                            You will be able to view this project's data in DQF if you sign in using the same email address.
+                        </p>
+                        <p>
+                            <a href="javascript:void(0);" class="bluebtn" id="createIntermediateProjectButton" onclick="createDqfProject();">Create DQF project</a>
+                            <div class="loader loader_on"></div>
+                        </p>
+                        <!--
+                        <a href="javascript:void(0);" class="bluebtn" onclick="$('#modal').trigger('openpreferences');">Add DQF credentials</a>
+                        -->
+                    </tal:block>
+                </tal:block>
+
+                <span tal:condition="not: user">
+                    To Create a DQF project you must be signed in.
+                    <a href="javascript:void(0);" class="bluebtn" onclick="$('#modal').trigger('openlogin');">Sign in</a>
+                </span>
+                </div>
+            </div>
+
+
+
+            <div tal:condition="dqf_intermediate_project">
+                <p>Dqf project was successfully created.</p>
+            </div>
+
         </div>
 
 
+        <tal:block tal:condition="project_completable">
+            <div class="completion-info">
+                <h4> Completion </h4>
+                <div>
+                    <p class="completableStatus"></p>
+
+                    <a href="#" class="standardbtn disabled completeProjectButton" style="float:unset;" >Complete project</a>
+                </div>
+            </div>
+        </tal:block>
+
     </div>
-    <div class="wrapper word-count-left">
+
+    <div tal:condition="splittable" class="wrapper word-count-left">
         <tal:block tal:define="id_for_job php:array()" tal:repeat="id_for_job jobs">
 
             <div tal:attributes="data-jid string:${repeat/id_for_job/key}; class string:jobcontainer ${id_for_job/splitted}">

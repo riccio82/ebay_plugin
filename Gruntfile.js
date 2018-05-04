@@ -28,8 +28,8 @@ module.exports = function(grunt) {
                     }
                 },
                 src: [
-                    'static/src/es6/react/*.js', 
-                    'static/src/js/*.js'
+                    'static/src/es6/react/*.js',
+                    'static/src/js/index.js'
                 ],
                 dest:  'static/build/ebay.js' 
             },

@@ -9,11 +9,13 @@
 
 namespace Features\Ebay\Controller;
 
+use BaseKleinViewController;
 use Features\Ebay\Decorator\AnalyzeDecorator ;
 
 use Analysis_AnalysisModel ;
+use PHPTALWithAppend;
 
-class AnalyzeController extends \BaseKleinViewController {
+class AnalyzeController extends BaseKleinViewController {
 
     /**
      * @var \Projects_ProjectStruct
@@ -21,7 +23,7 @@ class AnalyzeController extends \BaseKleinViewController {
     private $project;
 
     /**
-     * @var \PHPTAL ;
+     * @var \PHPTALWithAppend ;
      */
     protected $view;
 
@@ -41,24 +43,27 @@ class AnalyzeController extends \BaseKleinViewController {
     }
 
     public function setView( $template_name ) {
-        $this->view = new \PHPTALWithAppend( $template_name );
+        $this->view = new PHPTALWithAppend( $template_name );
     }
 
-
     public function respond() {
+        $this->user = $this->currentUser() ;
+
         $decorator = new AnalyzeDecorator( $this->model );
-
-
-        $decorator->setUser( $this->currentUser() ) ;
-        $this->setLoggedUser() ;
+        $decorator->setUser( $this->user ) ;
 
         $this->setDefaultTemplateData() ;
 
         $decorator->decorate( $this->view );
 
+        $this->project->getFeatures()->run('decorateTemplate', $this->view, $this);
 
         $this->response->body( $this->view->execute() );
         $this->response->send();
+    }
+
+    public function getModel() {
+        return $this->model ;
     }
 
     private function currentUser() {

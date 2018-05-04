@@ -8,21 +8,29 @@
 
 namespace Features\Ebay\Decorator;
 
-use AbstractModelViewDecorator ;
-
+use AbstractModelViewDecorator;
 use Analysis\Status;
+use Analysis_AnalysisModel;
 use Bootstrap;
+use DateTime;
+use Exception;
+use Features\Dqf;
 use Features\Ebay;
-use INIT ;
-use DateTime ;
-use Features\Ebay\Utils\Routes ;
+use Features\Ebay\Utils\Routes;
+use Files_FileDao;
+use FilesStorage;
+use INIT;
+use Langs_LanguageDomains;
+use PHPTALWithAppend;
+use Users_UserStruct;
 use Utils;
+use ZipArchiveExtended;
 
 
 class AnalyzeDecorator extends AbstractModelViewDecorator {
 
     /**
-     * @var \Analysis_AnalysisModel
+     * @var Analysis_AnalysisModel
      */
     protected $model ;
 
@@ -31,11 +39,13 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
      */
     protected $project ;
 
+    /**
+     * @var Users_UserStruct
+     */
     private $user ;
 
-    public function __construct( \Analysis_AnalysisModel $model ) {
+    public function __construct( Analysis_AnalysisModel $model ) {
         $this->model = $model ;
-
         $this->project = $this->model->getProject();
     }
 
@@ -78,7 +88,7 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
 
         $template->support_mail    = INIT::$SUPPORT_MAIL;
 
-        $langDomains = \Langs_LanguageDomains::getInstance();
+        $langDomains = Langs_LanguageDomains::getInstance();
         $this->subject = $langDomains::getDisplayDomain(null);
 
         $template->isLoggedIn = $this->user != null ;
@@ -92,9 +102,34 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         $template->daemon_misconfiguration = var_export( $misconfiguration, true );
         $template->project_data = $this->getProjectData() ;
 
+        $template->splittable = true;
+        $template->project_completable = true ;
+
+        $template->googleDriveEnabled = Bootstrap::isGDriveConfigured() ;
+
+        if ( $this->project->hasFeature( Dqf::FEATURE_CODE ) ) {
+            $this->__decorateForDqf( $template );
+        }
         $template->append('footer_js', Routes::staticSrc('js/ebay-analyze.js') );
 
         $this->setTemplateVarsAfter( $template );
+    }
+
+    private function __decorateForDqf( $template ) {
+        $intermediate_project_id = $this->project->getMetadataValue(Dqf::INTERMEDIATE_PROJECT_METADATA_KEY);
+
+        if ( !$intermediate_project_id ) {
+            $template->splittable = false ;
+            $template->project_completable = false;
+        }
+
+        $template->dqf_intermediate_project = $intermediate_project_id ;
+        $template->user = $this->user ;
+
+        if ( $this->user ) {
+            $template->dqf_user = new Dqf\Model\UserModel( $this->user ) ;
+        }
+
     }
 
     private function getProjectData() {
@@ -108,19 +143,22 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         }
 
         return array(
-                'instructions'            => $this->getInstructions(),
-                'file_name'               => $metadata[ 'file_name' ],
-                'due_date'                => $date,
-                'word_count'              => $metadata[ 'word_count' ],
-                'project_completion_timestamp' => $metadata[ Ebay::PROJECT_COMPLETION_METADATA_KEY ]
+                'instructions'                  => $this->getInstructions(),
+                'file_name'                     => $metadata[ 'file_name' ],
+                'due_date'                      => $date,
+                'word_count'                    => $metadata[ 'word_count' ],
+                'project_completion_timestamp'  => $metadata[ Ebay::PROJECT_COMPLETION_METADATA_KEY ],
+                'dqf_review_settings_id'        => $metadata[ 'dqf_review_settings_id' ],
+                'dqf_source_segments_submitted' => $metadata[ 'dqf_source_segments_submitted' ],
+                'dqf_master_project_creation_completed_at' => $metadata[ 'dqf_master_project_creation_completed_at' ]
         );
     }
 
     private function getInstructions() {
-        $files = \Files_FileDao::getByProjectId( $this->project->id );
-        $fs = new \FilesStorage();
+        $files = Files_FileDao::getByProjectId( $this->project->id );
+        $fs = new FilesStorage();
 
-        list($zip_filename) = explode(\ZipArchiveExtended::INTERNAL_SEPARATOR, $files[0]->filename);
+        list($zip_filename) = explode( ZipArchiveExtended::INTERNAL_SEPARATOR, $files[0]->filename);
 
         $zip_path = $fs->getOriginalZipPath(
                 $this->project->create_date,
@@ -138,8 +176,13 @@ class AnalyzeDecorator extends AbstractModelViewDecorator {
         return $content ;
     }
 
-    public function setUser( \Users_UserStruct $user=null ) {
-        $this->user = $user ;
+    public function setUser( Users_UserStruct $user=null ) {
+        if ( is_null( $user ) ) {
+            $this->user = new Users_UserStruct() ;
+        }
+        else {
+            $this->user = $user ;
+        }
     }
 
 

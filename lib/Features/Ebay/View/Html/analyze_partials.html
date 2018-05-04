@@ -5,12 +5,14 @@
             <th></th>
             <th tal:condition="enable_outsource">Payable</th>
             <th>Total</th>
+            <th tal:condition="dqf_enabled">DQF Revision</th>
+            <th tal:condition="dqf_enabled">DQF Translate</th>
         </tr>
         </thead>
         <tbody>
 
         <tr class="tablespace">
-            <td colspan="14">&nbsp;</td>
+            <td colspan="15">&nbsp;</td>
         </tr>
         </tbody>
 
@@ -26,12 +28,19 @@
                 <td tal:condition="enable_outsource" class="stat-payable">
                     <strong class="stat_tot" tal:content="job/total_eq_word_count_print">11,500</strong></td>
                 <td class="stat-total" tal:content="job/total_raw_word_count_print">13,500</td>
-
+                <td tal:condition="dqf_enabled" class="stat-email-revise">
+                    <div class="stat-email"></div>
+                    <div class="ui cancel label" style="display:none;"><i class="icon-cancel-circle"></i></div>
+                </td>
+                <td tal:condition="dqf_enabled" class="stat-email-translate">
+                    <div class="stat-email"></div>
+                    <div class="ui cancel label" style="display:none;"><i class="icon-cancel-circle"></i></div></td>
                 <td class="empty">
                     <a tal:attributes="href string:${basepath}translate/${pname}/${job/source_short}-${job/target_short}/${job/jid}-${job/jpassword}" href="#" target="_blank" class="uploadbtn translate">Translate</a>
                 </td>
 
                 <td class="empty undoCompleteBtnContainer"></td>
+                <td class="empty dqfAssignmentStatus" ></td>
             </tr>
             <tal:block tal:define="files job/files; f php:array()" tal:repeat="f files">
                 <tr tal:attributes="id string:file_${job/jid}_${job/jpassword}_${f/id}" id="file_1703" class="subfile part3files">
@@ -42,6 +51,7 @@
                     </td>
                     <td class="stat-total" tal:content="f/file_raw_word_count">7,500</td>
 
+                    <td class="empty"></td>
                     <td class="empty"></td>
                     <td class="empty"></td>
                 </tr>
