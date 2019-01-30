@@ -50,6 +50,12 @@ class CatDecorator extends \AbstractDecorator {
         $this->template->allow_link_to_analysis = false ;
         $this->template->translation_matches_enabled = false ;
 
+        $this->template->quality_report_href =  $this->template->quality_report_href = \Routes::pluginsBase() .
+                "/review_improved/quality_report/" .
+                "{$this->controller->getChunk()->id}/" .
+                "{$this->controller->getChunk()->password}";
+
+
     }
 
 }
