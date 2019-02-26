@@ -18,7 +18,7 @@ use Features\Ebay\Utils\Metadata;
 use Features\Ebay\Utils\Routes as Routes;
 use Features\Ebay\Utils\SkippedSegments;
 use Features\ProjectCompletion\CompletionEventStruct;
-use Features\ReviewImproved\Model\QualityReportModel;
+use Features\ReviewExtended\Model\QualityReportModel;
 use Klein\Klein;
 use Projects_ProjectStruct;
 
@@ -33,7 +33,7 @@ class Ebay extends BaseFeature {
     public static $dependencies = [
             Features::PROJECT_COMPLETION,
             Features::TRANSLATION_VERSIONS,
-            Features::REVIEW_IMPROVED
+            ReviewImproved::FEATURE_CODE
     ] ;
 
     const PROJECT_COMPLETION_METADATA_KEY = 'ebay_project_completed_at';
@@ -313,7 +313,8 @@ class Ebay extends BaseFeature {
     /**
      * Append the filter config to the post params which are coming from the UI.
      *
-     * @param $filter
+     * @param $inputFilter
+     *
      * @return mixed
      */
     public function filterCreateProjectInputFilters( $inputFilter ) {
@@ -346,15 +347,13 @@ class Ebay extends BaseFeature {
     public function project_completion_event_saved( Chunks_ChunkStruct $chunk, CompletionEventStruct $params, $lastId ) {
         $project = $chunk->getProject() ;
 
-        if ( in_array( Features::REVIEW_IMPROVED, $project->getFeatures()->getCodes() ) ) {
-            // reload quality report and dump it to file
-            $quality_report = new QualityReportModel( $chunk ) ;
-            $structure = $quality_report->getStructure();
+        // reload quality report and dump it to file
+        $quality_report = new QualityReportModel( $chunk ) ;
+        $structure = $quality_report->getStructure();
 
-            $this->getLogger()->info( "ChunkCompletionEvent LASTID: $lastId" );
-            $this->getLogger()->info( json_encode( $params ) ) ;
-            $this->getLogger()->info( json_encode( $structure ) ) ;
-        }
+        $this->getLogger()->info( "ChunkCompletionEvent LASTID: $lastId" );
+        $this->getLogger()->info( json_encode( $params ) ) ;
+        $this->getLogger()->info( json_encode( $structure ) ) ;
     }
 
     public function postJobMerged( $projectStructure ) {

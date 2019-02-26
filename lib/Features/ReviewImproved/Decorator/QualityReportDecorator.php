@@ -11,7 +11,7 @@ namespace Features\ReviewImproved\Decorator;
 use Bootstrap;
 use Features\QaCheckBlacklist;
 use Features\QaCheckGlossary;
-use Features\ReviewImproved\Model\QualityReportModel;
+use Features\ReviewExtended\Model\QualityReportModel;
 use INIT;
 
 

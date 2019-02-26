@@ -10,7 +10,7 @@ namespace Features\ReviewImproved\Controller;
 
 use Exceptions\NotFoundException;
 use Features;
-use Features\ReviewImproved\Model\QualityReportModel;
+use Features\ReviewExtended\Model\QualityReportModel;
 use Features\ReviewImproved\Decorator\QualityReportDecorator;
 
 class QualityReportController extends \BaseKleinViewController {
@@ -91,9 +91,8 @@ class QualityReportController extends \BaseKleinViewController {
             throw new NotFoundException();
         }
 
-        $project = $this->chunk->getProject();
-
-        if ( !$project->isFeatureEnabled( Features::REVIEW_IMPROVED ) && !$project->isFeatureEnabled( Features::REVIEW_EXTENDED ) ) {
+        // TODO: check this condition is necessary, this controller should only be used by an instance of AbstractRevisionFeature
+        if ( ! $this->featureSet->hasRevisionFeature() ) {
             throw new NotFoundException();
         }
 
