@@ -9,9 +9,7 @@ use LQA\ChunkReviewDao;
 class ReviewImproved extends AbstractRevisionFeature {
     const FEATURE_CODE = 'review_improved' ;
 
-    protected static $conflictingDependencies = [
-            ReviewExtended::FEATURE_CODE
-    ];
+    protected static $conflictingDependencies = [] ;
 
     /**
      * postJobSplitted
@@ -56,5 +54,10 @@ class ReviewImproved extends AbstractRevisionFeature {
         $template_path = dirname(__FILE__) . '/ReviewImproved/View/Html/quality_report.html' ;
         $controller->setView( $template_path );
         $controller->respond();
+    }
+
+    public function filterOverrideReviewExtended( $projectFeatures, $controller ) {
+        unset( $projectFeatures[ ReviewExtended::FEATURE_CODE ] ) ;
+        return $projectFeatures ;
     }
 }
