@@ -21,6 +21,7 @@ use Features\ProjectCompletion\CompletionEventStruct;
 use Features\ReviewExtended\Model\QualityReportModel;
 use Klein\Klein;
 use Projects_ProjectStruct;
+use Features\ReviewImproved ;
 
 class Ebay extends BaseFeature {
 
