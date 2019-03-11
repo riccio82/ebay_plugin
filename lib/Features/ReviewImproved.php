@@ -56,8 +56,9 @@ class ReviewImproved extends AbstractRevisionFeature {
         $controller->respond();
     }
 
-    public function filterOverrideReviewExtended( $projectFeatures, $controller ) {
-        unset( $projectFeatures[ ReviewExtended::FEATURE_CODE ] ) ;
-        return $projectFeatures ;
+    public function filterFeaturesMerged( $features ) {
+        unset( $features[ ReviewExtended::FEATURE_CODE ] );
+        return $features;
     }
+
 }
