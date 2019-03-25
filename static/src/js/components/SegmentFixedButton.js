@@ -3,7 +3,7 @@ class SegmentFixedButton extends React.Component{
 
     handleClick() {
         if ( !this.props.disabled ) {
-            window.ReviewImproved.clickOnFixed(this.props.sid);
+            ReviewImproved.clickOnFixed(this.props.sid);
         }
     }
 

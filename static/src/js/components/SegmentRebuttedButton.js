@@ -8,7 +8,7 @@ class SegmentRebuttedButton extends React.Component{
     }
 
     handleClick() {
-        window.ReviewImproved.clickOnRebutted(this.props.sid);
+        ReviewImproved.clickOnRebutted(this.props.sid);
     }
 
     componentDidMount() {

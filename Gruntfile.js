@@ -42,6 +42,7 @@ module.exports = function(grunt) {
                 },
                 src: [
                     'static/src/js/components/review_improved/*.js',
+                    'static/src/js/components/*.js',
                 ],
                 dest:  'static/build/js/ebay-components.js'
             },
