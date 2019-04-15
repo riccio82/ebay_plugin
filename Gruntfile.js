@@ -91,6 +91,16 @@ module.exports = function(grunt) {
                 ],
                 dest: 'static/build/css/review_improved.css'
             },
+            upload: {
+                options : {
+                    sourceMap : false,
+                },
+                src: [
+                    'static/src/css/sass/ebay-upload.scss'
+
+                ],
+                dest: 'static/build/css/ebay-upload.css'
+            },
         }
     });
 
@@ -109,7 +119,7 @@ module.exports = function(grunt) {
         'browserify:components',
         'browserify:qaReportsVersions',
         'concat',
-        'sass:app'
+        'sass'
     ]);
 
 
