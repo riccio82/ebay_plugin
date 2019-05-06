@@ -27,6 +27,7 @@ class NewProjectDecorator extends \AbstractDecorator
         $this->template->append('footer_js', Routes::staticSrc('js/libs/datepicker.min.js') );
 
         $this->template->append('css_resources', Routes::staticSrc('css/datepicker.min.css') );
+        $this->template->append('css_resources', Routes::staticBuild('css/ebay-upload.css') );
 
         $path = Ebay::getTemplatesPath() ;
         $this->template->additional_input_params_base_path = $path . '/Html/' ;
