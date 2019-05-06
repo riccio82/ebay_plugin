@@ -21,7 +21,7 @@ class ProjectCompletionEventSaved {
             Database::obtain()->begin() ;
             Database::obtain()->commit() ;
         } catch( \Exception $e ) {
-            Log::doLog('Error during ReviewImproved\Model\ProjectCompletionEventSaved::triggerForTranslate: ' . $e->getMessage() );
+            Log::doJsonLog('Error during ReviewImproved\Model\ProjectCompletionEventSaved::triggerForTranslate: ' . $e->getMessage() );
 
             Database::obtain()->rollback() ;
         }
