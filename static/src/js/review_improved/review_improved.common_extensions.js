@@ -148,39 +148,6 @@ if ( ReviewImproved.enabled() )
             }
         },
 
-        clickOnApprovedButton: function (e, button) {
-            // the event click: 'A.APPROVED' i need to specify the tag a and not only the class
-            // because of the event is triggered even on download button
-            e.preventDefault();
-            var sid = UI.currentSegmentId;
-            var goToNextNotApproved = ($(button).hasClass('approved')) ? false : true;
-            UI.tempDisablingReadonlyAlert = true;
-            SegmentActions.removeClassToSegment(sid, 'modified');
-            UI.currentSegment.data('modified', false);
-
-
-            $('.sub-editor.review .error-type').removeClass('error');
-
-            UI.changeStatus(button, 'approved', 0);  // this does < setTranslation
-
-            var original = UI.currentSegment.find('.original-translation').text();
-
-            if (goToNextNotApproved) {
-                UI.openNextTranslated();
-            } else {
-                UI.gotoNextSegment(sid);
-            }
-
-            var data = {
-                action: 'setRevision',
-                job: config.id_job,
-                jpassword: config.password,
-                segment: sid,
-                original: original
-            };
-
-            UI.setRevision(data);
-        },
         gotoSegment: function(id) {
             if ( !this.segmentIsLoaded(id) && UI.parsedHash.splittedSegmentId ) {
                 id = UI.parsedHash.splittedSegmentId ;
