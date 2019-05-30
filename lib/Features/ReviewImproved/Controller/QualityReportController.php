@@ -87,6 +87,8 @@ class QualityReportController extends \BaseKleinViewController {
                 $this->request->param( 'password' )
         );
 
+        $this->featureSet->loadForProject( $this->chunk->getProject() ) ;
+
         if ( !$this->chunk ) {
             throw new NotFoundException();
         }
