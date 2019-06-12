@@ -65,7 +65,12 @@ if ( ReviewImproved.enabled() && config.isReview ) {
 
     $(document).on('click', 'a.approved', function(e) {
         UI.changeStatus( this , 'approved', 0);
-        UI.openNextTranslated() ;
+        var goToNextNotApproved = ($(e.currentTarget).hasClass('approved')) ? false : true;
+        if (goToNextNotApproved) {
+            UI.openNextTranslated();
+        } else {
+            UI.gotoNextSegment(UI.currentSegmentId);
+        }
     });
 
     $(document).on('click', '.button-reject', function(e) {
