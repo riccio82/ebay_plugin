@@ -51,6 +51,29 @@ class Ebay extends BaseFeature {
     }
 
     /**
+     * This method handle the incompatibility between review extended and improved by removing the review_extended feature.
+     *
+     * In project creation, the callback "filterCreateProjectFeatures" is invoked by the mandatory plugin review_extended to add itself to the project features.
+     *
+     * When the project is subsequently handled by ProjectManager and the user has review_improved feature enabled ( ONLY happens to Ebay user ) those features are both added to the project
+     * and the project creation crashes because of a duplicate call to \AbstractRevisionFeature::postProjectCreate
+     * and a duplicate insert on qa_chunk_reviews is performed breaking database index integrity.
+     *
+     * @see ReviewExtended::filterCreateProjectFeatures
+     *
+     * @param array $projectFeatures
+     * @param $controller \NewController|\createProjectController
+     *
+     * @return mixed
+     */
+    public function filterOverrideReviewExtended( $projectFeatures, $controller ){
+        if( $projectFeatures[ ReviewExtended::FEATURE_CODE ] ){
+            unset( $projectFeatures[ ReviewExtended::FEATURE_CODE ] );
+        }
+        return $projectFeatures;
+    }
+
+    /**
      * This function overrides the default analyze page, doing a redirect
      * to the custom analyze page.
      *
