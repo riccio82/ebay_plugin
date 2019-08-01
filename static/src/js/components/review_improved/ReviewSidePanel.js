@@ -55,11 +55,13 @@ class ReviewSidePanel extends React.Component{
     }
 
     segmentOpened(sid, segment) {
-        this.setState({
-            sid: sid,
-            selection: null,
-            segment: segment
-        });
+        if (sid !== this.state.sid) {
+            this.setState({
+                sid: sid,
+                selection: null,
+                segment: segment
+            });
+        }
     }
 
     submitIssueCallback() {

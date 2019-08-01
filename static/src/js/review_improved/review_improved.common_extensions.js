@@ -19,10 +19,6 @@ if ( ReviewImproved.enabled() )
                 } ),
                 UI.issuesMountPoint );
         },
-
-        unmountPanelComponent : function() {
-            ReactDOM.unmountComponentAtNode( UI.issuesMountPoint );
-        },
         /**
          * getStatusForAutoSave
          *
@@ -55,7 +51,6 @@ if ( ReviewImproved.enabled() )
             return ReviewImproved.submitComment(id_segment, id_issue, data)
         },
         openIssuesPanel : function(data, openSegment) {
-            var segment = (data)? UI.Segment.findEl( data.sid ): data;
             $('body').addClass('review-improved-opened');
             hackIntercomButton( true );
             SearchUtils.closeSearch();
@@ -63,17 +58,12 @@ if ( ReviewImproved.enabled() )
             $('body').addClass('side-tools-opened review-side-panel-opened');
             window.dispatchEvent(new Event('resize'));
             if (data && openSegment) {
-                segment.find( UI.targetContainerSelector() ).click();
+                SegmentActions.openSegment(data.sid);
                 window.setTimeout( function ( data ) {
-                    var el = UI.Segment.find( data.sid ).el;
-
-                    if ( UI.currentSegmentId != data.sid ) {
-                        UI.focusSegment( el );
-                    }
-
-                    UI.scrollSegment( el );
+                    UI.scrollSegment( data.sid );
                 }, 500, data );
             }
+            return true;
         },
 
         closeIssuesPanel : function() {
@@ -81,9 +71,9 @@ if ( ReviewImproved.enabled() )
             hackIntercomButton( false );
             SegmentActions.closeIssuesPanel();
             $('body').removeClass('side-tools-opened review-side-panel-opened review-improved-opened');
-            if ( UI.currentSegment ) {
+            if ( UI.currentSegmentId ) {
                 setTimeout( function() {
-                    UI.scrollSegment( UI.currentSegment );
+                    UI.scrollSegment( UI.currentSegmentId );
                 }, 100 );
             }
             window.dispatchEvent(new Event('resize'));
@@ -147,28 +137,15 @@ if ( ReviewImproved.enabled() )
                 });
             }
         },
-
-        gotoSegment: function(id) {
-            if ( !this.segmentIsLoaded(id) && UI.parsedHash.splittedSegmentId ) {
-                id = UI.parsedHash.splittedSegmentId ;
-            }
-
-            if ( typeof id === 'undefined' ) {
-                console.debug( 'id is undefined', id);
-                return ;
-            }
-
-            if ( MBC.enabled() && MBC.wasAskedByCommentHash( id ) ) {
-                MBC.openSegmentComment( UI.Segment.findEl( id ) ) ;
-            } else {
-                SegmentActivator.activate(id);
-            }
-        },
+        showFixedAndRebuttedButtons ( status ) {
+            status = status.toLowerCase();
+            return status == 'rejected' || status == 'fixed' || status == 'rebutted' ;
+        }
     });
 
     $(document).ready(function() {
         UI.mountPanelComponent();
     });
 
-})(jQuery, window);
+})(jQuery, ReviewImproved);
 

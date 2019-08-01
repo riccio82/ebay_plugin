@@ -14,33 +14,16 @@ if ( ReviewImproved.enabled() && config.isReview ) {
 
     var versions = MateCat.db.segment_versions;
 
-    function overrideButtons() {
-        var div = $('<ul>' + UI.segmentButtons + '</ul>');
-
-        div.find('.translated')
-            .text('APPROVED')
-            .removeClass('translated')
-            .addClass('approved');
-
-        div.find('.next-untranslated').parent().remove();
-
-        UI.segmentButtons = div.html();
-    }
-
-    $('html').on('buttonsCreation', 'section', function() {
-        overrideButtons();
-    });
-
     $(document).on('click', 'section .textarea-container .errorTaggingArea', function(e) {
         var section = $(e.target).closest('section') ;
-
+        var id = UI.getSegmentId(section);
         if ( section.hasClass('muted') || section.hasClass('readonly') ) {
             return ;
         }
 
         if ( ! section.hasClass('opened') ) {
-            UI.openSegment( section );
-            UI.scrollSegment( section );
+            SegmentActions.openSegment(id);
+            UI.scrollSegment( id );
         }
     });
 
@@ -92,6 +75,8 @@ if ( ReviewImproved.enabled() && config.isReview ) {
 
 
     $(document).on('mouseup', 'section.opened .errorTaggingArea', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
         var segment = new UI.Segment( $(e.target).closest('section'));
         var selection = document.getSelection();
         var container = $(e.target).closest('.errorTaggingArea') ;
@@ -128,9 +113,7 @@ if ( ReviewImproved.enabled() && config.isReview ) {
         container.append(buttonsHTML);
     }
 
-    $.extend( ReviewImproved, {
-        renderButtons : renderButtons,
-    });
+
 
     getLatestScoreForSegment = function( segment ) {
         if (! segment) {
@@ -147,14 +130,19 @@ if ( ReviewImproved.enabled() && config.isReview ) {
         }, 0) ;
 
         return total_penalty ;
-    }
+    };
 
     var issuesChanged = function( record ) {
         var segment = UI.Segment.find(record.id_segment);
         if ( segment ) renderButtons( segment ) ;
-    }
+    };
 
     MateCat.db.addListener('segment_translation_issues', ['insert', 'delete', 'update'], issuesChanged );
 
+
+    $.extend( ReviewImproved, {
+        renderButtons : renderButtons,
+        getLatestScoreForSegment: getLatestScoreForSegment
+    });
 })($, window, ReviewImproved, UI);
 }

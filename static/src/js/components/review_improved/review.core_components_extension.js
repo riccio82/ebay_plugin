@@ -1,14 +1,14 @@
 (function() {
-    let ReviewImprovedSideButton = require('./ReviewImprovedTranslationIssuesSideButton').default;
+    let ReviewImprovedSideButton = require( './ReviewImprovedTranslationIssuesSideButton' ).default;
 
     function overrideTranslationIssuesSideButton( TranslationIssuesSideButton ) {
-        TranslationIssuesSideButton.prototype.render = function (  ) {
+        TranslationIssuesSideButton.prototype.render = function () {
             return <ReviewImprovedSideButton {...this.props}/>
         }
     }
 
     function overrideSegmentBodyFunctions( SegmentBody ) {
-        SegmentBody.prototype.getStatusMenu = function (  ) {
+        SegmentBody.prototype.getStatusMenu = function () {
             if ( this.state.showStatusMenu ) {
                 return <ul className="statusmenu" ref={( menu ) => this.statusMenuRef = menu}>
                     <li className="arrow"><span className="arrow-mcolor"/></li>
@@ -62,15 +62,15 @@
         };
 
         const originalbeforeRender = SegmentBody.prototype.beforeRenderOrUpdate;
-        SegmentBody.prototype.beforeRenderOrUpdate = function (  ) {
+        SegmentBody.prototype.beforeRenderOrUpdate = function () {
             if ( !(ReviewImproved && ReviewImproved.enabled() && Review.enabled()) ) {
-                originalbeforeRender.apply(this)
+                originalbeforeRender.apply( this )
             }
         };
         const originalAfterRender = SegmentBody.prototype.afterRenderOrUpdate;
-        SegmentBody.prototype.afterRenderOrUpdate = function (  ) {
+        SegmentBody.prototype.afterRenderOrUpdate = function () {
             if ( !(ReviewImproved && ReviewImproved.enabled() && Review.enabled()) ) {
-                originalAfterRender.apply(this);
+                originalAfterRender.apply( this );
             }
         }
     }
@@ -79,14 +79,65 @@
         let originalGetTargetArea = SegmentTarget.prototype.getTargetArea;
         SegmentTarget.prototype.getTargetArea = function ( translation ) {
             if ( ReviewImproved && ReviewImproved.enabled() && Review.enabled() ) {
-                return <div data-mount="segment_text_area_container">
-                    <div className="textarea-container" onClick={this.onClickEvent.bind( this )}>
-                        <div className="targetarea issuesHighlightArea errorTaggingArea"
-                             dangerouslySetInnerHTML={this.allowHTML( translation )}/>
-                    </div>
+                return <div className="textarea-container" onClick={this.onClickEvent.bind( this )}>
+                    <div className="targetarea issuesHighlightArea errorTaggingArea"
+                         dangerouslySetInnerHTML={this.allowHTML( translation )}/>
                 </div>
+
             } else {
-                return originalGetTargetArea.apply(this, [translation])
+                return originalGetTargetArea.apply( this, [translation] )
+            }
+        };
+    }
+
+    function overrideTargetButtons( SegmentButtons ) {
+        SegmentButtons.prototype.getButtons = function () {
+            let html;
+            if ( this.props.isReview ) {
+                //Revise of Review Improved
+                html = this.getReviewImprovedButtons()
+            } else {
+                //Translate of Review Improved
+                html = this.getReviewImprovedTranslateButtons()
+            }
+            return html;
+        };
+
+        SegmentButtons.prototype.getReviewImprovedButtons = function () {
+            let button;
+            let segment = UI.Segment.find( this.props.segment.sid );
+            let currentScore = ReviewImproved.getLatestScoreForSegment(segment );
+            if ( currentScore == 0 ) {
+                button = <li className="right">
+                    <a id={"segment-" + this.props.segment.sid + "-button-translated "}
+                       onClick={( event ) => this.clickOnApprovedButton( event )}
+                       data-segmentid={"segment-" + this.props.segment.sid}
+                       href="javascript:;" className="approved"
+                    >APPROVED</a>
+                    <p>{(UI.isMac) ? 'CMD' : 'CTRL'} ENTER</p>
+                </li>;
+            } else if ( currentScore > 0 ) {
+                button = <li className="right">
+                    <a className="button button-reject" href="javascript:;">REJECTED</a>
+                    <p>{(UI.isMac) ? 'CMD' : 'CTRL'}+SHIFT+DOWN</p>
+                </li>;
+            }
+            return <ul className="buttons toggle" data-mount="main-buttons" id={"segment-" + this.props.segment.sid + "-buttons"}>
+                {button}
+            </ul>
+        };
+        SegmentButtons.prototype.getReviewImprovedTranslateButtons = function () {
+            //TODO Remove lokiJs
+            let data = MateCat.db.segments.by( 'sid', this.props.segment.sid );
+            if ( UI.showFixedAndRebuttedButtons( data.status ) ) {
+                return <ul className="buttons toggle" data-mount="main-buttons" id={"segment-" + this.props.segment.sid + "-buttons"}>
+                    <MC.SegmentMainButtons
+                        status={data.status}
+                        sid={data.sid}
+                    />
+                </ul>
+            } else {
+                return this.getTranslateButtons()
             }
         };
     }
@@ -96,6 +147,8 @@
     overrideSegmentTargetFunctions(SegmentTarget);
 
     overrideSegmentBodyFunctions(SegmentBody);
+
+    overrideTargetButtons(SegmentButtons)
 
 
 })();

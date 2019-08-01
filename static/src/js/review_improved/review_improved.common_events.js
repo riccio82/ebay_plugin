@@ -13,7 +13,7 @@ if ( ReviewImproved.enabled() ) {
         return segment.isICELocked() || (
             !segment.isReadonly() && ( !segment.isSplit() || segment.isFirstOfSplit() )
         );
-    }
+    };
 
     $(document).on('segment-filter:filter-data:load', function() {
         UI.closeIssuesPanel();
@@ -51,12 +51,6 @@ if ( ReviewImproved.enabled() ) {
         );
     })();
 
-    $(document).on('editingSegment:change', function(e, data) {
-        if ( data.segment == null ) {
-            UI.closeIssuesPanel();
-        }
-    });
-
     $(document).on('click', function( e ) {
         if ($(e.target).closest('body') == null ) {
             // it's a detatched element, likely the APPROVE button.
@@ -86,12 +80,6 @@ if ( ReviewImproved.enabled() ) {
             if (!$('.modal').is(':visible')) {
                 UI.closeIssuesPanel();
             }
-        }
-    });
-
-    $(document).on('header-tool:open', function(e, data) {
-        if ( data.name == 'search' ) {
-            UI.closeIssuesPanel();
         }
     });
 
