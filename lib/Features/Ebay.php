@@ -71,6 +71,9 @@ class Ebay extends BaseFeature {
         if( $projectFeatures[ ReviewExtended::FEATURE_CODE ] ){
             unset( $projectFeatures[ ReviewExtended::FEATURE_CODE ] );
         }
+        if( $projectFeatures[ SecondPassReview::FEATURE_CODE ] ){
+            unset( $projectFeatures[ SecondPassReview::FEATURE_CODE ] );
+        }
         return $projectFeatures;
     }
 

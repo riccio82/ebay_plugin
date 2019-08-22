@@ -1,5 +1,5 @@
 if ( ReviewImproved.enabled() )
-    (function($, ReviewImproved, undefined) {
+    (function($, ReviewImproved) {
 
     var prev_getStatusForAutoSave = UI.getStatusForAutoSave ;
     /**
@@ -170,5 +170,5 @@ if ( ReviewImproved.enabled() )
         UI.mountPanelComponent();
     });
 
-})(jQuery, window);
+})(jQuery, ReviewImproved);
 

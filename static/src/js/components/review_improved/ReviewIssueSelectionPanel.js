@@ -65,6 +65,7 @@ class ReviewIssueSelectionPanel extends React.Component{
                 'end_offset'          : this.props.selection.end_offset,
                 'comment'             : message,
                 'version'             : this.props.segmentVersion,
+                'revision_number'     : config.revisionNumber
             };
         }.bind(this) );
 
