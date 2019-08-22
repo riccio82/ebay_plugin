@@ -8,6 +8,7 @@
 
 namespace Features;
 
+use API\V2\Validators\SegmentTranslationIssue;
 use Chunks_ChunkStruct;
 use controller;
 use Constants_TranslationStatus;
@@ -71,6 +72,10 @@ class Ebay extends BaseFeature {
             unset( $projectFeatures[ ReviewExtended::FEATURE_CODE ] );
         }
         return $projectFeatures;
+    }
+
+    public static function loadSegmentTranslationIssueValidator( SegmentTranslationIssue $validator ){
+        return new ReviewImproved\Controller\API\V2\Validators\SegmentTranslationIssue( $validator->getRequest() );
     }
 
     /**
