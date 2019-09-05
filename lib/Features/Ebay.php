@@ -19,6 +19,7 @@ use Features\Ebay\Utils\Routes as Routes;
 use Features\Ebay\Utils\SkippedSegments;
 use Features\ProjectCompletion\CompletionEventStruct;
 use Features\ReviewExtended\Model\QualityReportModel;
+use FilesStorage\AbstractFilesStorage;
 use Klein\Klein;
 use Projects_ProjectStruct;
 use Features\ReviewImproved ;
@@ -277,7 +278,7 @@ class Ebay extends BaseFeature {
     public function filter_project_manager_array_files( $files, $projectStructure ) {
         $new_files = array() ;
         foreach ( $files as $file ) {
-            if ( \FilesStorage::pathinfo_fix( $file, PATHINFO_EXTENSION ) != 'g' ) {
+            if ( AbstractFilesStorage::pathinfo_fix( $file, PATHINFO_EXTENSION ) != 'g' ) {
                 $new_files[] = $file ;
             }
         }
