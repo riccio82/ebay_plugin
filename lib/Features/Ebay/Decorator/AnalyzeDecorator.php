@@ -22,6 +22,7 @@ use FilesStorage\FilesStorageFactory;
 use FilesStorage\S3FilesStorage;
 use INIT;
 use Langs_LanguageDomains;
+use SimpleS3\Client;
 use Users_UserStruct;
 use Utils;
 use ZipArchiveExtended;
