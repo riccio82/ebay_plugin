@@ -65,7 +65,7 @@ class ProjectCompletionStatusModel {
 
         if ( $this->isRecompletable( $project_completion_date ) ) {
             return [
-                    'status'       => self::STATUS_RECOMPLETABLE,
+                    'status'       => self::STATUS_COMPLETED,
                     'completed_at' => $project_completion_date->format('c')
             ];
         }

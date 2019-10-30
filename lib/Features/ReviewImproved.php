@@ -35,7 +35,7 @@ class ReviewImproved extends AbstractRevisionFeature {
         $reviews = ChunkReviewDao::findByIdJob( $id_job );
         foreach( $reviews as $review ) {
             $model = new ChunkReviewModel($review);
-            $model->recountAndUpdatePassFailResult();
+            $model->recountAndUpdatePassFailResult( $review->getChunk()->getProject() );
         }
     }
 
