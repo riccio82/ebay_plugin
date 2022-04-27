@@ -13,7 +13,7 @@
     "babel-preset-react": "^6.3.13",
     "babelify": "^7.2.0",
     "classnames": "^2.2.3",
-    "grunt": "^1.0.4",
+    "grunt": "^1.5.2",
     "grunt-browserify": "^5.3.0",
     "grunt-contrib-concat": "~1.0.1",
     "grunt-contrib-jshint": "^2.0.0",
